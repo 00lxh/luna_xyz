@@ -26,6 +26,7 @@ function HookingService:HookRemote(Object, __callback)
 	end));
 
 	hookedFunctions[__callback] = { __hook = "__namecall"; __old = Old_Namecall; };
+	return Old_Namecall;
 end;
 
 function HookingService:NameCallHook(Object, Method, __callback)
@@ -42,6 +43,7 @@ function HookingService:NameCallHook(Object, Method, __callback)
 	end));
 
 	hookedFunctions[__callback] = { __hook = "__namecall"; __old = Old_Namecall; };
+	return Old_Namecall;
 end;
 
 function HookingService:IndexHook(Object, Property, Value)
