@@ -1,7 +1,6 @@
 ----- || LIBRARY || -----
 
 local cloneref = (cloneref or function(instance: any) return instance end);
-
 local CoreGui = cloneref(game:GetService("CoreGui"));
 
 local TextService = cloneref(game:GetService("TextService"));
