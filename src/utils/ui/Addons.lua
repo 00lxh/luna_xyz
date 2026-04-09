@@ -25,7 +25,7 @@ if #listfiles("luna_xyz/addons") <= 0 then
 	return {};
 end;
 
-repeat task.wait() until luna_xyz_loaded;
+repeat task.wait() until getgenv().luna_xyz_loaded;
 if not luna_xyz_addons then getgenv().luna_xyz_addons = {}; end;
 
 AddonsTab:UpdateWarningBox({
