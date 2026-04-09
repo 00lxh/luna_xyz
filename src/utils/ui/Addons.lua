@@ -29,6 +29,9 @@ function addons:LoadAddons()
 
 	repeat task.wait() until luna_xyz_loaded;
 	if not luna_xyz_addons then getgenv().luna_xyz_addons = {}; end;
+	
+	local startTime = os.time();
+	Logger.wait("Loading addons..");
 
 	AddonsTab:UpdateWarningBox({
 
@@ -38,8 +41,8 @@ function addons:LoadAddons()
 
 	for i, v in pairs(listfiles("luna_xyz/addons")) do
 
-		local startTime = os.time(); local addon_name = v:match(".+\\(.+)") or v;
-		Logger.event('Loading addon ' .. addon_name .. '..');
+		local startTime2 = os.time(); local addon_name = v:match(".+\\(.+)") or v;
+		Logger.wait('Loading addon ' .. addon_name .. '..');
 
 		local __s, file_data = pcall(function()
 			return loadfile(v)();
@@ -47,7 +50,7 @@ function addons:LoadAddons()
 
 		if not luna_xyz_addons.AddonInfo then
 
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 			Logger.error('    RUNTIME ERROR: "AddonInfo" table not found.');
 
 			continue;
@@ -57,7 +60,7 @@ function addons:LoadAddons()
 
 		if not addon_info.Game or not luna_xyz_env:IsValidGame(addon_info.Game) then
 
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 			Logger.error('    RUNTIME ERROR: The game "' .. tostring(addon_info.Game) .. '" is not supported by luna.xyz!');
 
 			continue;
@@ -65,7 +68,7 @@ function addons:LoadAddons()
 
 		if not addon_info.Title  then
 
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 			Logger.error('    RUNTIME ERROR: You must enter a valid addon title!');
 
 			continue;
@@ -80,14 +83,16 @@ function addons:LoadAddons()
 
 		if not __s then
 
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 			Logger.error('    RUNTIME ERROR: ' .. tostring(__e));
 
 			continue;
 		end;
 
-		Logger.success('The addon ' .. addon_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+		Logger.success('The addon ' .. addon_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 	end;
+	
+	Logger.success('Loaded addons. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
 end;
 
 return addons;
