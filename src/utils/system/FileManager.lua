@@ -1,4 +1,4 @@
-local FileManager, hash_cache = {}, {};
+local FileManager, hash_cache = { FilesLoaded = false; }, {};
 
 if not luna_xyz_env._SupportsFileSystem then
 	
@@ -90,36 +90,34 @@ end;
 
 local modules_list = {
 	
-	["UI"] = {
+	{ name = "UI", data = {
 		
-		Library = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua";
+		{ name = "Library", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua" },
 		
-		ThemeManager = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua";
-		SaveManager = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua";
+		{ name = "ThemeManager", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua" },
+		{ name = "SaveManager", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua" },
 		
-		UIManager = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/UIManager.lua";
-		Addons = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua";
+		{ name = "Notify", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua" },
+		{ name = "UIManager", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/UIManager.lua" },
 		
-		Notify = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua";
-	};
-	
-	["universal"] = {
-		
-		ControlModule = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/ControlModule.lua";
-		Fly = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua";
-	};
+		{ name = "Addons", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Addons.lua" },
+	}},
 
-	["system"] = {
+	{ name = "universal", data = {
 		
-		BloxstrapRPC = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua";
-		Environment = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua";
-	};
+		{ name = "ControlModule", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/ControlModule.lua" },
+		{ name = "Fly", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua" },
+	}},
 
-	Signal = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Signal.lua";
-	Maid = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Maid.lua";
+	{ name = "system", data = {
+		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },
+		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
+	}},
 
-	HookService = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/HookService.lua";
-};
+	{ name = "HookService", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/HookService.lua" },
+	{ name = "Signal", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Signal.lua" },
+	{ name = "Maid", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Maid.lua" },
+}
 
 local luna_files = {
 
@@ -168,11 +166,7 @@ end;
 function FileManager:MergeTables(default, current)
 	
 	for key, value in pairs(default) do
-		if current[key] == nil then
-
-			current[key] = value;
-			
-		elseif typeof(value) == "table" and typeof(current[key]) == "table" then		
+		if current[key] == nil then current[key] = value; elseif typeof(value) == "table" and typeof(current[key]) == "table" then		
 			FileManager:MergeTables(value, current[key]);
 		end;
 	end;
@@ -327,18 +321,20 @@ Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() -
 startTime = os.time();
 Logger.wait("Fetching hub modules..");
 
-for module_path, module_data in pairs(modules_list) do
+for _, module in ipairs(modules_list) do
 
-	if typeof(module_data) ~= "table" then
-
-		FileManager:LoadModule(module_path, module_data);
+	if not module.data then
+		
+		FileManager:LoadModule(module.name, module.url);
 		continue;
 	end;
 	
-	for module_name, module_url in pairs(module_data) do
-		FileManager:LoadModule(module_path .. '/' .. module_name, module_url);
+	for _, sub in ipairs(module.data) do
+		FileManager:LoadModule(module.name .. '/' .. sub.name, sub.url)
 	end;
 end;
 
 Logger.success('Loaded hub modules. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-return {};
+FileManager.FilesLoaded = true;
+
+return FileManager;
