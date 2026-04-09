@@ -1,5 +1,5 @@
 local Fly = { FlyBody = nil; FlyGyro = nil; Enabled = false; Speed = 15; Loaded = false };
-local ControlModule = Services:GetServices("ControlModule");
+local ControlModule = Services:GetService("ControlModule");
 
 function Fly:Setup()
 	
