@@ -3,6 +3,8 @@
 local cloneref = (cloneref or function(instance: any) return instance end);
 
 local CoreGui = cloneref(game:GetService("CoreGui"));
+
+local TextService = cloneref(game:GetService("TextService"));
 local RunService = cloneref(game:GetService("RunService"));
 
 getgenv().Logger = {
@@ -126,10 +128,8 @@ local function CreateLog(_type: string, str: string)
 	local color = Logger[_type].Color or Color3.fromRGB(255, 255, 255);
 	local text_color = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255);
 
-	Current_logs[log_id] = {
-		
-		Icon = icon; Color = color;
-		str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, _type, tostring(str), log_id) .. '</font>';
+	Current_logs[log_id] = {	
+		Icon = icon; Color = color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, _type, tostring(str), log_id) .. '</font>'
 	};
 	
 	print(log_id);
@@ -255,8 +255,8 @@ function Logger:CreateLoading(options: table)
 			local lastLog = isfile(saveLocation .. current_date .. '.log') and readfile(saveLocation .. current_date .. '.log') .. '\n' or "";
 			writefile(saveLocation .. current_date .. '.log', lastLog .. string.format("[%s]: [%s] %s (%s)", log_date, loader_obj.Title, loader_obj.CurrentStep < loader_obj.TotalSteps and 'Loading started! - (' .. loader_obj.Subject .. ')' or 'Loading finished! - (' .. loader_obj.Subject .. ')', log_id));
 		end;
-		
-		return { Icon = icon; Color = loader_obj.Color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, loader_obj.Title, str, log_id) .. '</font>'; };
+
+		return { Icon = icon; Color = loader_obj.Color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, loader_obj.Title, str, log_id) .. '</font>' };
 	end;
 
 	Current_logs[log_id] = UpdateLoadingText(true);
@@ -343,7 +343,9 @@ getgenv().logger_conn = RunService.Heartbeat:Connect(function()
 		for log_id, log_data in pairs(Current_logs) do
 
 			if not v.Text or not v.Text:find(log_id, 1, true) then continue; end;
+			
 			v.RichText = true; v.Text = log_data.str;
+			v.Parent.AutomaticSize = Enum.AutomaticSize.Y; v.AutomaticSize = Enum.AutomaticSize.Y;
 			
 			v.Parent.image.Image = Logger.IconsEnabled and log_data.Icon.Url or ""; v.Parent.image.ImageColor3 = log_data.Color;
 			v.Parent.image.ImageRectOffset = log_data.Icon.ImageRectOffset; v.Parent.image.ImageRectSize = log_data.Icon.ImageRectSize;
