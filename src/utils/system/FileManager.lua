@@ -96,28 +96,29 @@ local modules_list = {
 		
 		ThemeManager = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua";
 		SaveManager = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua";
-
-		-- Addons
-		-- Creator
-		-- Notify
-
+		
+		UIManager = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/UIManager.lua";
+		Addons = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua";
+		
+		Notify = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua";
 	};
 	
 	["universal"] = {
 		
-		-- Fly
+		ControlModule = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/ControlModule.lua";
+		Fly = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua";
 	};
 
 	["system"] = {
 		
-		BloxstrapRPC = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/utilities/BloxstrapRPC.luau";
-		-- FileManager
+		BloxstrapRPC = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua";
+		Environment = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua";
 	};
 
-	Signal = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/packages/Signal.luau";
-	Maid = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/packages/Maid.luau";
+	Signal = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Signal.lua";
+	Maid = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Maid.lua";
 
-	HookService = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/packages/Hooks.luau";
+	HookService = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/HookService.lua";
 };
 
 local luna_files = {
