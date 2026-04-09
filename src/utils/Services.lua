@@ -1,4 +1,4 @@
-local Services = {};
+getgenv().Services = {};
 local cloneref = (cloneref or function(instance: any) return instance end);
 
 local luna_storage = Instance.new("Folder", gethui and gethui() or cloneref(game:GetService("CoreGui")));
