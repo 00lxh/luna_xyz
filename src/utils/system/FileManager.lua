@@ -106,7 +106,9 @@ local modules_list = {
 	{ name = "universal", data = {
 		
 		{ name = "ControlModule", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/ControlModule.lua" },
+		
 		{ name = "Fly", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua" },
+		{ name = "ESP", url = "https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau" },
 	}},
 
 	{ name = "system", data = {
