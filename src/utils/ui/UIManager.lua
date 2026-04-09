@@ -1,11 +1,4 @@
 local UICreator = {};
-local ThemeManager = Services:GetService("ThemeManager");
-
-luna_xyz_env.Library = Services:GetService("Library");
-luna_xyz_env.SaveManager = Services:GetService("SaveManager");
-
-luna_xyz_env.Toggles = getgenv().Library.Toggles;
-luna_xyz_env.Options = getgenv().Library.Options;
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
@@ -67,6 +60,14 @@ local function GetGreeting()
 end;
 
 function UICreator:CreateWindow()
+
+	luna_xyz_env.Library = Services:GetService("Library");
+	
+	luna_xyz_env.ThemeManager = Services:GetService("ThemeManager");
+	luna_xyz_env.SaveManager = Services:GetService("SaveManager");
+
+	luna_xyz_env.Toggles = getgenv().Library.Toggles;
+	luna_xyz_env.Options = getgenv().Library.Options;
 	
 	Logger.wait("Loading main window..");
 	luna_xyz_env.time_elapsed = 0;
@@ -436,11 +437,11 @@ function UICreator:CreateSettingsTab()
 	
 	Logger.wait("Loading default theme..");
 	
-	ThemeManager:SetLibrary(luna_xyz_env.Library);
+	luna_xyz_env.ThemeManager:SetLibrary(luna_xyz_env.Library);
 	luna_xyz_env.SaveManager:SetLibrary(luna_xyz_env.Library);
 	
 	local __s, __d = pcall(function()
-		ThemeManager:SetDefaultTheme({
+		luna_xyz_env.ThemeManager:SetDefaultTheme({
 
 			BackgroundColor = Color3.fromRGB(15, 15, 15); MainColor = Color3.fromRGB(25, 25, 25);
 			AccentColor = Color3.fromRGB(255, 200, 76); OutlineColor = Color3.fromRGB(40, 40, 40);
@@ -456,7 +457,7 @@ function UICreator:CreateSettingsTab()
 		
 	else Logger.success("Default theme loaded."); end;
 	
-	ThemeManager:ApplyToTab(SettingsTab);
+	luna_xyz_env.ThemeManager:ApplyToTab(SettingsTab);
 	Logger.wait("Loading settings..");
 	
 	luna_xyz_env.SaveManager:IgnoreThemeSettings();
