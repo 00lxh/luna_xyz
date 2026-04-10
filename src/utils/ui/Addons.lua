@@ -31,7 +31,7 @@ function addons:LoadAddons()
 	if not luna_xyz_addons then getgenv().luna_xyz_addons = {}; end;
 	
 	local startTime = os.time();
-	Logger.wait("Loading addons..");
+	Logger.debug("Loading addons..");
 
 	AddonsTab:UpdateWarningBox({
 
@@ -42,7 +42,7 @@ function addons:LoadAddons()
 	for i, v in pairs(listfiles("luna_xyz/addons")) do
 
 		local startTime2 = os.time(); local addon_name = v:match(".+\\(.+)") or v;
-		Logger.wait('Loading addon ' .. addon_name .. '..');
+		Logger.debug('Loading addon ' .. addon_name .. '..');
 
 		local __s, file_data = pcall(function()
 			return loadfile(v)();
