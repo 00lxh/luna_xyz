@@ -17,7 +17,7 @@ function Notifications:Notify(str: string, time: number)
 	luna_xyz_env.Library:Notify({
 
 		Icon = "rbxassetid://5012126105"; Time = time or 5;
-		Title = '<b><font size="20">luna.xyz - ' .. tostring(luna_xyz_env.hub_version) .. '</font></b>'; Description = tostring(str);
+		Title = '<b><font size="20">luna.xyz - ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. '</font></b>'; Description = tostring(str);
 	});
 end;
 
