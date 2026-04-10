@@ -59,12 +59,13 @@ getgenv().Logger = {
 	["LOADING"] = {
 		Icon = "loader"; AltIcon = "rbxassetid://11293978505";
 	};
+	
+	ClassName = "Logger";
+	IconsEnabled = true;
+	
+	ConsoleLogs = true;
+	SaveLogs = false;
 };
-
-Logger.ClassName = "Logger";
-
-Logger.IconsEnabled = true;
-Logger.SaveLogs = false;
 
 Logger.__index = Logger;
 
@@ -130,8 +131,7 @@ local function CreateLog(_type: string, str: string)
 	Current_logs[log_id] = {	
 		Icon = icon; Color = color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, _type, tostring(str), log_id) .. '</font>'
 	};
-	
-	print(log_id);
+	if Logger.ConsoleLogs then print(log_id); end;
 	
 	if Logger.SaveLogs and isfile and readfile and writefile then
 
@@ -259,7 +259,7 @@ function Logger:CreateLoading(options: table)
 	end;
 
 	Current_logs[log_id] = UpdateLoadingText(true);
-	print(log_id);
+	if Logger.ConsoleLogs then print(log_id); end;
 	
 	function loader_obj:SetTitle(str: string)
 		
@@ -320,8 +320,20 @@ end;
 
 function Logger:ToggleIcons(value: boolean)
 
-	assert(typeof(value) == "boolean", "Invalid string location.");
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleIcons" (string expected, got ' .. typeof(value) .. ')');
 	Logger.IconsEnabled = value;
+end;
+
+function Logger:ToggleLogs(value: boolean)
+
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleLogs" (string expected, got ' .. typeof(value) .. ')');
+	Logger.SaveLogs = value;
+end;
+
+function Logger:ToggleConsoleLogs(value: boolean)
+
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleConsoleLogs" (string expected, got ' .. typeof(value) .. ')');
+	Logger.ConsoleLogs = value;
 end;
 
 function Logger:Destroy()
