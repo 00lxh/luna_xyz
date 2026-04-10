@@ -179,7 +179,7 @@ end;
 function FileManager:LoadModule(module_path: string, module_data: string)
 	
 	local startTime = os.time();
-	Logger.wait('Checking module: ' .. module_path .. '.lua');
+	Logger.debug('Checking module: ' .. module_path .. '.lua');
 
 	local local_file = 'luna_xyz/utils/'.. module_path .. '.lua';
 	local cache  = hash_cache[module_path];
@@ -227,7 +227,7 @@ end;
 ----- || FILE CHECK || -----
 
 local startTime = os.time();
-Logger.wait("Checking files integrity..");
+Logger.debug("Checking files integrity..");
 
 for folder_name, folder_data in pairs(luna_files) do
 
@@ -294,7 +294,7 @@ Logger.success('Files integrity good. - (' .. string.format("%.2f", os.time() - 
 ----- || CACHE CHECK || -----
 
 local startTime2 = os.time();
-Logger.wait("Fetching cache data..");
+Logger.debug("Fetching cache data..");
 
 if isfile("luna_xyz/hash_cache.json") then
 	hash_cache = luna_xyz_env.HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
@@ -305,7 +305,7 @@ Logger.success('Loaded cache data. - (' .. string.format("%.2f", os.time() - sta
 ----- || ANALITYCS CHECK || -----
 
 startTime2 = os.time();
-Logger.wait("Fetching analytics data..");
+Logger.debug("Fetching analytics data..");
 
 if not isfile("luna_xyz/analytics/stats.json") then
 	writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(analytics_data_template));
@@ -323,7 +323,7 @@ Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() -
 ----- || MODULES CHECK || -----
 
 startTime = os.time();
-Logger.wait("Fetching hub modules..");
+Logger.debug("Fetching hub modules..");
 
 for _, module in ipairs(modules_list) do
 
