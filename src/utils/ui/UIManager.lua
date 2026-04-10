@@ -1,5 +1,13 @@
 local UICreator = {};
 
+luna_xyz_env.Library = Services:GetService("Library");
+
+luna_xyz_env.ThemeManager = Services:GetService("ThemeManager");
+luna_xyz_env.SaveManager = Services:GetService("SaveManager");
+
+luna_xyz_env.Toggles = getgenv().Library.Toggles;
+luna_xyz_env.Options = getgenv().Library.Options;
+
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
 	"The same side of the Moon always faces Earth due to tidal locking.";
@@ -44,34 +52,26 @@ local moonFunFacts = {
 };
 
 local function GetGreeting()
-	
+
 	local hour = os.date("*t").hour;
 
 	if hour >= 5 and hour < 12 then
-		
+
 		return "Good morning";
-		
+
 	elseif hour >= 12 and hour < 19 then
-		
+
 		return "Good afternoon";
 	end;
-	
+
 	return "Good evening";
 end;
 
 function UICreator:CreateWindow()
 
-	luna_xyz_env.Library = Services:GetService("Library");
-	
-	luna_xyz_env.ThemeManager = Services:GetService("ThemeManager");
-	luna_xyz_env.SaveManager = Services:GetService("SaveManager");
-
-	luna_xyz_env.Toggles = getgenv().Library.Toggles;
-	luna_xyz_env.Options = getgenv().Library.Options;
-	
-	Logger.wait("Loading main window..");
+	Logger.debug("Loading main window..");
 	luna_xyz_env.time_elapsed = 0;
-	
+
 	local Window = luna_xyz_env.Library:CreateWindow({
 
 		Title = "luna.xyz";
@@ -83,47 +83,47 @@ function UICreator:CreateWindow()
 		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
 		NotifySide = "Right"; MenuFadeTime = 0; TabPadding = 2;
 	});
-	
+
 	luna_xyz_env.Library.ForceCheckbox = true; 
 	Logger.success("Main window loaded.");
-	
+
 	----- || NOTIFICATIONS || -----
-	
-	Logger.wait("Loading notifications module..");
+
+	Logger.debug("Loading notifications module..");
 
 	luna_xyz_env.NotifyVolume = 2;
 	luna_xyz_env.NotifySound = true;
-	
+
 	luna_xyz_env.NotifySoundID = 82845990304289;
 	luna_xyz_env.Notify = Services:GetService("Notify");
-	
+
 	Logger.success("Notifications module loaded.");
-	
+
 	----- || HOME || -----
-	
-	Logger.wait("Creating home tab..");
+
+	Logger.debug("Creating home tab..");
 	local HomeTab = Window:AddTab("Home", "house");
-	
+
 	HomeTab:UpdateWarningBox({
 
 		Title = '<font size="20">Welcome to <font color="rgb(255, 200, 76)">luna.xyz</font></font>!', Visible = true; IsNormal = true;
 		Text = '\n<b>Moon fun fact:\n</b>' .. moonFunFacts[math.random(1, #moonFunFacts)];
 	});
-	
+
 	local AccountGroup = HomeTab:AddLeftGroupbox("Account", "circle-user-round");
-	
+
 	local ScriptStatusGroup = HomeTab:AddRightGroupbox("Script Status", "scroll");
 	local AnalyticsGroup = HomeTab:AddRightGroupbox("Analytics", "chart-no-axes-combined");
-	
+
 	AccountGroup:AddImage("MyImage", {
-		
+
 		Height = 200;
 		Image = luna_xyz_env.Players:GetUserThumbnailAsync(luna_xyz_env.LP.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
 	});
-	
+
 	AccountGroup:AddLabel(GetGreeting() .. ', ' .. luna_xyz_env.LP.DisplayName .. ' - <b>Member</b>', true);
 	AccountGroup:AddDivider();
-	
+
 	AccountGroup:AddButton("Join Discord", function()
 
 		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
@@ -142,7 +142,7 @@ function UICreator:CreateWindow()
 		setclipboard(luna_xyz_env.discord_id);
 		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
 	end);
-	
+
 	AccountGroup:AddButton({
 
 		Text = "Scriptblox Profile";
@@ -159,39 +159,39 @@ function UICreator:CreateWindow()
 			luna_xyz_env.Notify:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
-	
+
 	for i, v in pairs(luna_xyz_env.supported_games) do
-		
+
 		if v.GameId == 142823291 then continue; end;
-		
+
 		local placeName = i:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
 			return a:upper() .. b:lower();
 		end);
-		
+
 		local text_color = (game.PlaceId == v.GameId or game.GameId == v.GameId) and "66, 149, 245" or "255, 255, 255";
 		ScriptStatusGroup:AddLabel('[🟢] <b><font color="rgb(' .. text_color  .. ')">' .. placeName .. '</font></b>', true);
 	end;
-	
+
 	ScriptStatusGroup:AddDivider();
 	ScriptStatusGroup:AddLabel('<b>Join our official Discord server to see a detailed log of updates and the status of the scripts!</b>', true);
-	
+
 	AnalyticsGroup:AddLabel('Exploit: <b>' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. '</b>', true);
 	AnalyticsGroup:AddLabel('Total Executions: <b>' .. luna_xyz_env.analytics_data.TotalExecutions .. '</b>', true);
-	
+
 	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)]) .. '</b>', true);
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
-	
+
 	task.spawn(function()
 		while task.wait(1) and luna_xyz_env do
-			
+
 			luna_xyz_env.time_elapsed += 1;
 			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.time_elapsed) .. '</b>');
-			
+
 			luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)] += luna_xyz_env.time_elapsed;
 			writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(luna_xyz_env.analytics_data));
 		end;
 	end);
-	
+
 	Logger.success("Home tab created.");
 
 	----- || FUNCITONS CHECK || -----
@@ -199,17 +199,17 @@ function UICreator:CreateWindow()
 	luna_xyz_env.CheckToggle = function(toggleName: string, value: boolean)
 		return luna_xyz_env.Toggles[toggleName] and luna_xyz_env.Toggles[toggleName].Value == value;
 	end;
-	
+
 	luna_xyz_env.CheckOption = function(optionName: string, value: any)
 		return luna_xyz_env.Options[optionName] and (typeof(luna_xyz_env.Options[optionName].Value) == "table" and luna_xyz_env.Options[optionName].Value[value] or luna_xyz_env.Options[optionName].Value == value);
 	end;
-	
+
 	----- || UNLOAD HANDLER || -----
 
 	luna_xyz_env.Library:OnUnload(function()
 
 		if Services:GetService("Cache") then Services:GetService("Cache"):Destroy(); end;
-		
+
 		luna_xyz_env.Library.Unloaded = true;
 		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:Destroy(); --Logger:Destroy(); --ESP:Destroy();
 
@@ -221,9 +221,9 @@ function UICreator:CreateWindow()
 end;
 
 function UICreator:CreateTimeoutInfoTab()
-		
+
 	local ErrorTab = luna_xyz_env.Window:AddTab("Error", "triangle-alert");
-	
+
 	ErrorTab:UpdateWarningBox({
 
 		Title = '<font size="20">luna.xyz - RUNTIME ERROR</font>', Visible = true;
@@ -232,25 +232,25 @@ function UICreator:CreateTimeoutInfoTab()
 
 	local ResourcesGroup = ErrorTab:AddLeftGroupbox("Resources");
 	local ErrorInfoGroup = ErrorTab:AddRightGroupbox("Error Info");
-	
+
 	ResourcesGroup:AddLabel('Discord link:\n' .. luna_xyz_env.discord_id, true);
 	ResourcesGroup:AddDivider();
-	
+
 	ResourcesGroup:AddButton("Join Discord", function()
-		
+
 		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
-		
+
 		Inviter.Join(luna_xyz_env.discord_id);
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
-		
+
 	end):AddButton("Copy Link", function()
 
 		if not setclipboard then
-			
+
 			luna_xyz_env.Notify:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
-		
+
 		setclipboard(luna_xyz_env.discord_id);
 		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
 	end);
@@ -259,34 +259,34 @@ function UICreator:CreateTimeoutInfoTab()
 end;
 
 function UICreator:CreateSettingsTab()
-	
-	Logger.wait("Creating settings tab..");
+
+	Logger.debug("Creating settings tab..");
 	local SettingsTab = luna_xyz_env.Window:AddTab("Settings", "cog");
-	
+
 	if not luna_xyz_env._SupportsFileSystem then
-		
+
 		SettingsTab:UpdateWarningBox({
 
 			Title = '<font size="20">luna.xyz - FileSystem API ERROR</font>', Visible = true;
 			Text = "\nluna.xyz was unable to save settings and custom themes (<b>ERROR: FileSystem API</b>)\n<i>If the error persists, please contact the development team.</i>";
 		});
 	end;
-	
+
 	local MenuGroup = SettingsTab:AddLeftGroupbox("Menu Options", "cog");
 	local UIGroup = SettingsTab:AddRightTabbox("UI");
-	
+
 	local UI_Tab = UIGroup:AddTab("UI", "app-window");
 	local NotificationsTab = UIGroup:AddTab("Notify", "bell");
-	
+
 	----- || MENU || -----
-	
+
 	MenuGroup:AddToggle("ToggleWaterMark", {
 
 		Text = "Toggle Watermark";
 		Default = true;
 
 		Callback = function(value)
-			
+
 		end;
 	});
 
@@ -309,7 +309,7 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.Library.ShowCustomCursor = Value;
 		end;
 	});
-	
+
 	MenuGroup:AddToggle("ForceCheckbox", {
 
 		Text = "Force Checkbox";
@@ -319,19 +319,19 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.Library.ForceCheckbox = Value;
 		end;
 	});
-	
+
 	MenuGroup:AddDivider();
-	
+
 	MenuGroup:AddToggle("DiscordRichPresence", {
 		Text = "Discord Rich Presence"; Default = false;
 	});
-	
+
 	MenuGroup:AddToggle("ExecuteOnTeleport", {
 		Text = "Execute on Teleport"; Default = false;
 	});
-	
+
 	MenuGroup:AddDivider();
-	
+
 	MenuGroup:AddButton("Join Discord", function()
 
 		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
@@ -350,14 +350,14 @@ function UICreator:CreateSettingsTab()
 		setclipboard(luna_xyz_env.discord_id);
 		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
 	end);
-	
+
 	MenuGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
 	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
-	
+
 	----- || UI || -----
-	
+
 	UI_Tab:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
-	
+
 	UI_Tab:AddDropdown("DPIDropdown", {
 
 		Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" };
@@ -366,12 +366,12 @@ function UICreator:CreateSettingsTab()
 		Text = "DPI Scale";
 
 		Callback = function(Value)
-			
+
 			Value = Value:gsub("%%", "");
 			luna_xyz_env.Library:SetDPIScale(tonumber(Value));
 		end;
 	}); 
-	
+
 	----- || NOTIFICATIONS || -----
 
 	NotificationsTab:AddToggle("PlayAlertSound", {
@@ -383,7 +383,7 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.NotifySound = Value;
 		end;
 	});
-	
+
 	NotificationsTab:AddDropdown("NotificationSide", {
 
 		Values = { "Left", "Right" };
@@ -395,12 +395,12 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.Library:SetNotifySide(Value);
 		end;
 	});
-	
+
 	NotificationsTab:AddSlider("NotifyVolume", {
 
 		Text = "Notify Volume";
 		Compact = false;
-		
+
 		Default = luna_xyz_env.NotifyVolume;
 		Min = 0; Max = 5; Rounding = 1;
 
@@ -408,38 +408,38 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.NotifyVolume = value;
 		end;
 	});
-	
+
 	NotificationsTab:AddInput("NotificationSoundID", {
-		
+
 		Text = "Notification Sound ID";
-		
+
 		Default = "rbxassetid://82845990304289"; Placeholder = "rbxassetid://82845990304289";
 		Numeric = false; Finished = true; ClearTextOnFocus = false;
 
 		Callback = function(Value)
-			
+
 			Value = Value:gsub("rbxassetid://", "");
 			luna_xyz_env.NotifySoundID = tonumber(Value);
 		end;
 	});
-	
+
 	NotificationsTab:AddButton("Reset Sound to Default", function()	
 		luna_xyz_env.Library.Options.NotificationSoundID:SetValue("rbxassetid://82845990304289");
 	end);
-	
+
 	NotificationsTab:AddButton("Test Notification", function()
 		luna_xyz_env.Notify:Notify("This is a test notification. You can change the sound settings above.");
 	end);
-	
+
 	Logger.success("Settings tab created.");
-	
+
 	----- || SETTINGS || -----
-	
-	Logger.wait("Loading default theme..");
-	
+
+	Logger.debug("Loading default theme..");
+
 	luna_xyz_env.ThemeManager:SetLibrary(luna_xyz_env.Library);
 	luna_xyz_env.SaveManager:SetLibrary(luna_xyz_env.Library);
-	
+
 	local __s, __d = pcall(function()
 		luna_xyz_env.ThemeManager:SetDefaultTheme({
 
@@ -449,17 +449,17 @@ function UICreator:CreateSettingsTab()
 			FontColor = Color3.new(1, 1, 1); FontFace = Enum.Font.Code;
 		});
 	end);
-	
+
 	if not __s then
-		
+
 		Logger.error("Failed to load Default theme");
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
-		
+
 	else Logger.success("Default theme loaded."); end;
-	
+
 	luna_xyz_env.ThemeManager:ApplyToTab(SettingsTab);
-	Logger.wait("Loading settings..");
-	
+	Logger.debug("Loading settings..");
+
 	luna_xyz_env.SaveManager:IgnoreThemeSettings();
 	luna_xyz_env.SaveManager:BuildConfigSection(SettingsTab);
 
@@ -467,10 +467,10 @@ function UICreator:CreateSettingsTab()
 	luna_xyz_env.SaveManager:LoadAutoloadConfig();
 
 	luna_xyz_env.Maid:GiveTask(luna_xyz_env.LP.OnTeleport:Connect(function()
-		
+
 		if not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or getgenv().queued_to_teleport then return; end;
 		getgenv().queued_to_teleport = true;
-		
+
 		--queue_on_teleport([[ loadstring(game:HttpGet("https://github.com/notpoiu/mspaint/releases/latest/download/Script.luau"))() ]]);
 	end));
 
@@ -479,43 +479,43 @@ function UICreator:CreateSettingsTab()
 end;
 
 function UICreator:CreateCreditsTab()
-	
-	Logger.wait("Creating credits tab..");
+
+	Logger.debug("Creating credits tab..");
 	local CreditsTab = luna_xyz_env.Window:AddTab("Credits", "users");
-	
+
 	local OwnersSection = CreditsTab:AddLeftGroupbox("Owners", "moon");
-	
+
 	--local DevelopersSection = CreditsTab:AddLeftGroupbox("Developers", "scroll");
 	local TestersSection = CreditsTab:AddLeftGroupbox("Testers", "flask-conical");
-	
+
 	local ContributorsSection = CreditsTab:AddRightGroupbox("Contributors", "puzzle");
 	local CommunitySection = CreditsTab:AddRightGroupbox("Community", "message-circle");
-	
+
 	----- || OWNERS || -----
-	
+
 	OwnersSection:AddLabel('[<font color="rgb(255, 200, 76)">00._lxh</font>] - Owner of luna.xyz', true);
-	
+
 	----- || DEVELOPERS || ----
-	
+
 	----- || TESTERS || -----
-	
+
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen', true);
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of rakoof, project lazarus', true);
-	
+
 	----- || CONTRIBUTORS || -----
 
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with rakoof, rake remastered, project lazarus', true);
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">Ryo Yamada</font>] - Helped with revenant sunrisen', true);
-	
+
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">deividcomsono</font>] - Obsidian UI library developer', true);
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">mspaint</font>] - Inspiration for the new version of luna.xyz', true);
-	
+
 	ContributorsSection:AddLabel('[<font color="rgb(255, 102, 204)">You</font>] - Thanks for all the support and for using my script', true);
-	
+
 	----- || COMMUNITY || -----
-	
+
 	CommunitySection:AddLabel('Official luna.xyz socials', true);
-	
+
 	CommunitySection:AddButton("Join Discord", function()
 
 		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
@@ -551,7 +551,7 @@ function UICreator:CreateCreditsTab()
 			luna_xyz_env.Notify:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
-	
+
 	Logger.success("Credits tab created.");
 	return CreditsTab;
 end;
