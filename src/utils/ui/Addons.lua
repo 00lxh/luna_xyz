@@ -1,4 +1,67 @@
 local addons = {};
+local lastPosition = 1;
+
+local function CreateGroupboxProxy(AddonGroupbox)
+	
+	local actions = {};
+
+	local proxy = setmetatable({}, {
+		__index = function(_, method) return function(_, ...) table.insert(actions, { method, {...} }); end; end;
+	});
+
+	local function CommitUI()
+		for _, action in ipairs(actions) do
+			
+			local method, args = action[1], action[2];
+			if AddonGroupbox[method] then AddonGroupbox[method](AddonGroupbox, unpack(args)); end;
+		end;
+	end;
+
+	local function ClearUI() table.clear(actions); end;
+	return proxy, CommitUI, ClearUI;
+end;
+
+local function CreateAddonGroupbox(AddonsTab, title, icon)
+
+	local Groupbox = lastPosition == 1 and AddonsTab:AddLeftGroupbox(title, icon or "") or AddonsTab:AddRightGroupbox(title, icon or "");
+	if lastPosition == 1 then lastPosition = 2; else lastPosition = 1; end;
+
+	return Groupbox;
+end;
+
+local function CreateAddonEnv(AddonsTab, addon_name)
+
+	local exec_env, real_env, addon_env = getrenv(), {}, {};
+	
+	setmetatable(addon_env, {
+
+		__newindex = function(_, key, value)
+
+			if key ~= "AddonInfo" then
+
+				rawset(real_env, key, value); rawset(addon_env, key, value);
+				return;
+			end;
+
+			rawset(real_env, key, value); rawset(addon_env, key, value);
+
+			local realGroupbox = CreateAddonGroupbox(AddonsTab, value.Title .. ' - ' .. addon_name, value.Icon or "")
+			local proxy, CommitUI, ClearUI = CreateGroupboxProxy(realGroupbox);
+
+			rawset(real_env, "Groupbox", proxy); rawset(addon_env, "Groupbox", proxy);
+			rawset(addon_env, "CurrentGroupbox", realGroupbox); rawset(addon_env, "CommitUI", CommitUI); rawset(addon_env, "ClearUI", ClearUI);
+		end;
+
+		__index = function(_, key)
+			return rawget(addon_env, key) or AddonsTab[key] or luna_xyz_env[key] or exec_env[key];
+		end;
+	});
+
+	addon_env.luna_xyz = addon_env;
+	addon_env.luna_xyz_env = luna_xyz_env;
+
+	return addon_env;
+end;
 
 function addons:LoadAddons()
 	
@@ -28,8 +91,7 @@ function addons:LoadAddons()
 	end;
 
 	repeat task.wait() until luna_xyz_loaded;
-	if not luna_xyz_addons then getgenv().luna_xyz_addons = {}; end;
-	
+
 	local startTime = os.time();
 	Logger.debug("Loading addons..");
 
@@ -38,61 +100,86 @@ function addons:LoadAddons()
 		Title = '<font size="20">luna.xyz - WARNING</font>', Visible = true;
 		Text = "\nThis tab is for UN-OFFICIAL addons made for luna.xyz, We are not responsible for what addons you will use. You are putting yourself <b>AT RISK</b> since you are executing third-party scripts.";
 	});
-
+	
 	for i, v in pairs(listfiles("luna_xyz/addons")) do
-
+		
 		local startTime2 = os.time(); local addon_name = v:match(".+\\(.+)") or v;
 		Logger.debug('Loading addon ' .. addon_name .. '..');
+		
+		if not ({lua=true, luau=true, txt=true})[(v:match("%.([%w]+)$") or ""):lower()] then
+			
+			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"');
 
-		local __s, file_data = pcall(function()
-			return loadfile(v)();
-		end);
-
-		if not luna_xyz_addons.AddonInfo then
-
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: "AddonInfo" table not found.');
-
-			continue;
-		end;
-
-		local addon_info = luna_xyz_addons.AddonInfo;
-
-		if not addon_info.Game or not luna_xyz_env:IsValidGame(addon_info.Game) then
-
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: The game "' .. tostring(addon_info.Game) .. '" is not supported by luna.xyz!');
+			local Groupbox = CreateAddonGroupbox(AddonsTab, addon_name);
+			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"</font>', true);
 
 			continue;
 		end;
 
-		if not addon_info.Title  then
+		local fn = loadfile and loadfile(v) or loadstring(readfile(v));
+		local addon_env = CreateAddonEnv(AddonsTab, addon_name);
+		
+		setfenv(fn, addon_env);
+		local success, runtimeErr = pcall(fn);
 
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: You must enter a valid addon title!');
+		if not addon_env.AddonInfo then
+			
+			if addon_env.ClearUI then addon_env.ClearUI(); end;
 
-			continue;
-		end;
+			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: "AddonInfo" table not found');
 
-		luna_xyz_addons.Groupbox = lastPosition == 1 and AddonsTab:AddLeftGroupbox(addon_info.Title, addon_info.Icon or "") or AddonsTab:AddRightGroupbox(addon_info.Title, addon_info.Icon or "");
-		if lastPosition == 1 then lastPosition = 2; else lastPosition = 1; end;
-
-		local __s, __e = pcall(function()
-			return loadfile(v)();
-		end);
-
-		if not __s then
-
-			Logger.error('Failed to load addon ' .. addon_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: ' .. tostring(__e));
+			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
+			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: "AddonInfo" table not found</font>', true);
 
 			continue;
 		end;
 
+		if not addon_env.AddonInfo.Title then
+			
+			if addon_env.ClearUI then addon_env.ClearUI(); end;
+
+			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(addon_env.AddonInfo.Title) .. ')');
+
+			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
+			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(addon_env.AddonInfo.Title) .. ')</font>', true);
+
+			continue;
+		end;
+		
+		if not addon_env.AddonInfo.Game or not luna_xyz_env:IsValidGame(addon_env.AddonInfo.Game) then
+
+			if addon_env.ClearUI then addon_env.ClearUI(); end;
+
+			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Unsupported game (' .. tostring(addon_env.AddonInfo.Game) .. ') by luna.xyz');
+
+			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
+			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Unsupported game (' .. tostring(addon_env.AddonInfo.Game) .. ') by luna.xyz</font>', true);
+
+			continue;
+		end;
+		
+		if not success then
+			
+			if addon_env.ClearUI then addon_env.ClearUI(); end;
+
+			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: ' .. tostring(runtimeErr));
+
+			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
+			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: ' .. tostring(runtimeErr) .. '</font>', true);
+
+			continue;
+		end;
+		
+		addon_env.CommitUI();
 		Logger.success('The addon ' .. addon_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 	end;
 	
-	Logger.success('Loaded addons. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	Logger.success('Loaded luna.xyz addons. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
 end;
 
 return addons;
