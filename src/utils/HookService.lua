@@ -1,7 +1,7 @@
 local HookingService, hookedFunctions, signalFunctions = {}, {}, {};
 HookingService.ClassName = "HookingService";
 
-local newcclosure = (newcclosure or function(...) return ... end);
+local newcclosure = (newcclosure or function(fn: any) return fn end);
 
 function HookingService:Hook(__callback, __callback_hook)
 	
