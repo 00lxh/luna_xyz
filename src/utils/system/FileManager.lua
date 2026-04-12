@@ -189,17 +189,17 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 	local local_file = 'luna_xyz/utils/'.. module_path .. '.lua';
 	local cache  = hash_cache[module_path];
 
-	local __s, __e = pcall(game.HttpGet, game, module_data);
+	local __s, __d = pcall(game.HttpGet, game, module_data);
 
 	if not __s then
 
 		Logger.error('Failed to fetch module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-		Logger.error('    RUNTIME ERROR: ' .. tostring(__e));
+		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
 	end;
 
-	local remoteHash = FileManager:GetHash(__e);
+	local remoteHash = FileManager:GetHash(__d);
 	local needsUpdate = not cache or cache.hash ~= remoteHash or cache.url ~= module_data or not isfile(local_file);
 
 	if needsUpdate then
@@ -209,23 +209,23 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 		hash_cache[module_path] = { hash = remoteHash; url = module_data; time = os.time(); };
 		writefile("luna_xyz/hash_cache.json", HttpService:JSONEncode(hash_cache));
 
-		writefile(local_file, __e);
+		writefile(local_file, __d);
 		Logger.info('Module ' .. module_path ..  '.lua updated. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 	end;
 
-	local __s, __e = pcall(function()
-		return loadfile and loadfile(local_file)() or loadstring(readfile(local_file))();
+	local __s, __d = pcall(function()
+		return loadfile(local_file)();
 	end);
 
 	if not __s then
 
 		Logger.error('Failed to load module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-		Logger.error('    RUNTIME ERROR: ' .. tostring(__e));
+		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
 	end;
 
-	luna_xyz_env.loaded_libs[module_path:match(".+/(.+)") or module_path] = __e;
+	luna_xyz_env.loaded_libs[module_path:match(".+/(.+)") or module_path] = __d;
 	Logger.success('The module ' .. module_path .. '.lua loaded successfully. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
 end;
 
@@ -328,7 +328,7 @@ Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() -
 ----- || MODULES CHECK || -----
 
 startTime = os.time();
-Logger.debug("Fetching hub modules..");
+Logger.debug("Fetching luna.xyz modules..");
 
 for _, module in ipairs(modules_list) do
 
@@ -343,7 +343,7 @@ for _, module in ipairs(modules_list) do
 	end;
 end;
 
-Logger.success('Loaded hub modules. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+Logger.success('Loaded luna.xyz modules. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
 FileManager.FilesLoaded = true;
 
 return FileManager;
