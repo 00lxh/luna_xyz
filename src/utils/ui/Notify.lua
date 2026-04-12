@@ -1,12 +1,20 @@
 local Notifications = {
-	NotifyVolume = 2; NotifySound = true; NotifySoundId = 82845990304289; DefaultSoundId = 82845990304289;
+	
+	NotifyVolume = 2; NotifySound = true; NotifyType = "luna.xyz";
+	NotifySoundId = 82845990304289; DefaultSoundId = 82845990304289;
 };
 
+local customNotifications = {};
 local CacheFoler = luna_xyz_env:GetService("Cache");
 
-function Notifications:Notify(str: string, time: number)
+function Notifications:Notify(options)
+	
+	assert(options, "Argument #1 missing or nil");
+	assert(typeof(options) == "table", 'Invalid argument #1 to "Notify" (table expected, got ' .. typeof(options) .. ')');
+	
+	local customNotification = customNotifications[Notifications.NotifyType];
 
-	if Notifications.NotifySound then
+	if Notifications.NotifySound and not (customNotification and customNotification.OverwriteNotifySound) then
 
 		local notifySound = Instance.new("Sound", CacheFoler);
 		notifySound.PlayOnRemove = true;
@@ -16,17 +24,79 @@ function Notifications:Notify(str: string, time: number)
 
 		notifySound:Destroy();
 	end;
+	
+	if customNotification then
+		return customNotification:Notify(options);
+	end;
 
-	luna_xyz_env.Library:Notify({
+	return luna_xyz_env.Library:Notify({
 
-		Icon = "rbxassetid://5012126105"; Time = time or 5;
-		Title = '<b><font size="20">luna.xyz - ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. '</font></b>'; Description = tostring(str);
+		Icon = "rbxassetid://5012126105"; Time = options.Time or 5;
+		Title = '<b><font size="20">luna.xyz - ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. '</font></b>'; Description = tostring(options.Description);
 	});
 end;
 
 function Notifications:GetCustomNotifications()
 	
-	return {};
+	customNotifications = {};
+	if not luna_xyz_env._SupportsFileSystem or #listfiles("luna_xyz/assets") <= 0 then return customNotifications; end;
+	
+	local startTime = os.time();
+	Logger.debug("Loading custom notifications..");
+	
+	for i, v in pairs(listfiles("luna_xyz/assets")) do
+
+		local startTime2 = os.time(); local notification_name = v:match(".+\\(.+)") or v;
+		Logger.debug('Loading custom notification ' .. notification_name .. '..');
+
+		if not ({lua=true, luau=true, txt=true})[(v:match("%.([%w]+)$") or ""):lower()] then
+
+			Logger.error('Failed to load custom notification ' .. notification_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"');
+
+			continue;
+		end;
+		
+		local __s, __d = pcall(function()
+			return loadfile and loadfile(v)() or loadstring(readfile(v))();
+		end);
+
+		if not __s then
+
+			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
+
+			continue;
+		end;
+		
+		if not __d.Name then
+
+			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(__d.Name) .. ')');
+
+			continue;
+		end;
+		
+		if not __d.Notify then
+
+			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error('    RUNTIME ERROR: Invalid Notify function (function expected, got ' .. typeof(__d.Notify) .. ')');
+
+			continue;
+		end;
+
+		customNotifications[__d.Name] = __d;
+		Logger.success('Custom notification ' .. notification_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+	end;
+	
+	Logger.success('Loaded luna.xyz custom notifications. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	return customNotifications;
+end;
+
+function Notifications:SetNotifyTpe(notifyTpe: string)
+
+	assert(luna_xyz_env:IsString(notifyTpe), "Invalid notification type.");
+	Notifications.NotifyType = notifyTpe;
 end;
 
 function Notifications:SetVolume(volume: number)
