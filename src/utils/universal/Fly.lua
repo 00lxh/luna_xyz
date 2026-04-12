@@ -1,5 +1,13 @@
 local Fly = { FlyBody = nil; FlyGyro = nil; Enabled = false; Speed = 15; Loaded = false };
-local ControlModule = Services:GetService("ControlModule");
+
+local ControlModule = luna_xyz_env:GetService("ControlModule");
+local CurrentCamera = workspace.CurrentCamera;
+
+local UserInputService = luna_xyz_env:GetService("UserInputService");
+local RunService = luna_xyz_env:GetService("RunService");
+
+local Players = luna_xyz_env:GetService("Players");
+local LP = Players.LocalPlayer;
 
 function Fly:Setup()
 	
@@ -11,20 +19,20 @@ function Fly:Setup()
 	flyGyro.MaxTorque, flyGyro.P = Vector3.one * 9e9, 9e4;
 	Fly.FlyBody, Fly.FlyGyro = flyBody, flyGyro;
 
-	luna_xyz_env.Maid.Fly = luna_xyz_env.RunService.RenderStepped:Connect(function()
+	luna_xyz_env.Maid.Fly = RunService.RenderStepped:Connect(function()
 		
 		if not Fly.Enabled or not luna_xyz_env then return; end;
 
 		local velocity = Vector3.zero;
 		local moveVector = ControlModule:GetMoveVector();
 		
-		velocity = -((luna_xyz_env.Camera.CFrame.LookVector * moveVector.Z) - (luna_xyz_env.Camera.CFrame.RightVector * moveVector.X));
+		velocity = -((CurrentCamera.CFrame.LookVector * moveVector.Z) - (CurrentCamera.CFrame.RightVector * moveVector.X));
 
-		if luna_xyz_env.UserInputService:IsKeyDown(Enum.KeyCode.Space) then velocity += luna_xyz_env.Camera.CFrame.UpVector; end;
-		if luna_xyz_env.UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then velocity -= luna_xyz_env.Camera.CFrame.UpVector; end;
+		if UserInputService:IsKeyDown(Enum.KeyCode.Space) then velocity += CurrentCamera.CFrame.UpVector; end;
+		if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then velocity -= CurrentCamera.CFrame.UpVector; end;
 
 		Fly.FlyBody.Velocity = velocity * Fly.Speed;
-		Fly.FlyGyro.CFrame = luna_xyz_env.Camera.CFrame;
+		Fly.FlyGyro.CFrame = CurrentCamera.CFrame;
 	end);
 	
 	Fly.Loaded = true;
@@ -32,15 +40,19 @@ end;
 
 function Fly:Toggle(value: boolean)
 	
+	local Character = luna_xyz_env:GetCharacter(LP);
+	local RootPart = luna_xyz_env:GetRoot(LP);
+	
+	local Humanoid = Character:FindFirstChildOfClass("Humanoid");
 	if not Fly.Loaded then return warn('Use "Fly:Setup()" before using this function.'); end;
 
-	if not luna_xyz_env.RootPart then return warn("luna_xyz_env.RootPart is missing or nil."); end;
-	if luna_xyz_env.Humanoid then luna_xyz_env.Humanoid.PlatformStand = value; end;
+	if not RootPart then return warn("luna_xyz_env.RootPart is missing or nil."); end;
+	if Humanoid then Humanoid.PlatformStand = value; end;
 	
 	Fly.Enabled = value;
 	
-	Fly.FlyBody.Parent = if value then luna_xyz_env.RootPart else nil;
-	Fly.FlyGyro.Parent = if value then luna_xyz_env.RootPart else nil;
+	Fly.FlyBody.Parent = if value then RootPart else nil;
+	Fly.FlyGyro.Parent = if value then RootPart else nil;
 end;
 
 function Fly:SetSpeed(speed: number)
