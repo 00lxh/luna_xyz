@@ -1,5 +1,6 @@
 local UICreator = {};
 
+local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
 luna_xyz_env.Library = Services:GetService("Library");
 
 luna_xyz_env.ThemeManager = Services:GetService("ThemeManager");
@@ -126,8 +127,6 @@ function UICreator:CreateWindow()
 
 	AccountGroup:AddButton("Join Discord", function()
 
-		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
-
 		Inviter.Join(luna_xyz_env.discord_id);
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
 
@@ -179,16 +178,21 @@ function UICreator:CreateWindow()
 	AnalyticsGroup:AddLabel('Total Executions: <b>' .. luna_xyz_env.analytics_data.TotalExecutions .. '</b>', true);
 
 	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)]) .. '</b>', true);
+	
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
+	local startTime = os.clock();
 
 	task.spawn(function()
 		while task.wait(1) and luna_xyz_env do
+			
+			local elapsed = math.floor(os.clock() - startTime);
 
-			luna_xyz_env.time_elapsed += 1;
+			luna_xyz_env.time_elapsed = elapsed; luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)] = elapsed;
 			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.time_elapsed) .. '</b>');
-
-			luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)] += luna_xyz_env.time_elapsed;
-			writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(luna_xyz_env.analytics_data));
+			
+			if luna_xyz_env.time_elapsed % 10 == 0 then
+				writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(luna_xyz_env.analytics_data));
+			end;
 		end;
 	end);
 
@@ -209,9 +213,10 @@ function UICreator:CreateWindow()
 	luna_xyz_env.Library:OnUnload(function()
 
 		if Services:GetService("Cache") then Services:GetService("Cache"):Destroy(); end;
-
+		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:DoCleaning();
+		
 		luna_xyz_env.Library.Unloaded = true;
-		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:Destroy(); --Logger:Destroy(); --ESP:Destroy();
+		mstudio45_ESP:Destroy();
 
 		getgenv().luna_xyz_env = nil; getgenv().luna_xyz_addons = nil;
 		getgenv().luna_xyz_loading = nil; getgenv().luna_xyz_loaded = nil;
@@ -237,8 +242,6 @@ function UICreator:CreateTimeoutInfoTab()
 	ResourcesGroup:AddDivider();
 
 	ResourcesGroup:AddButton("Join Discord", function()
-
-		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
 
 		Inviter.Join(luna_xyz_env.discord_id);
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
@@ -329,12 +332,20 @@ function UICreator:CreateSettingsTab()
 	MenuGroup:AddToggle("ExecuteOnTeleport", {
 		Text = "Execute on Teleport"; Default = false;
 	});
+	
+	MenuGroup:AddToggle("CreateLogs", {
+
+		Text = "Create Logs";
+		Default = true;
+
+		Callback = function(Value)
+			luna_xyz_env.Library.ForceCheckbox = Value;
+		end;
+	});
 
 	MenuGroup:AddDivider();
 
 	MenuGroup:AddButton("Join Discord", function()
-
-		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
 
 		Inviter.Join(luna_xyz_env.discord_id);
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
@@ -517,8 +528,6 @@ function UICreator:CreateCreditsTab()
 	CommunitySection:AddLabel('Official luna.xyz socials', true);
 
 	CommunitySection:AddButton("Join Discord", function()
-
-		local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
 
 		Inviter.Join(luna_xyz_env.discord_id);
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
