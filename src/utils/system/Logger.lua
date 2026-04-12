@@ -1,7 +1,9 @@
 ----- || LIBRARY || -----
-
+local clonefunction = (clonefunction or function(fn: any) return fn end);
 local cloneref = (cloneref or function(instance: any) return instance end);
+
 local CoreGui = cloneref(game:GetService("CoreGui"));
+local new_print = clonefunction(print);
 
 local TextService = cloneref(game:GetService("TextService"));
 local RunService = cloneref(game:GetService("RunService"));
@@ -78,7 +80,7 @@ local __s, __d = pcall(function()
 	return (loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/lucide-roblox-direct/refs/heads/main/source.lua")) :: () -> IconModule)();
 end);
 
-if not Current_logs then getgenv().Current_logs = {}; end;
+if not current_logs then getgenv().current_logs = {}; end;
 if logger_conn then logger_conn:Disconnect(); logger_conn = nil; end;
 
 ----- || METHODS || -----
@@ -128,10 +130,10 @@ local function CreateLog(_type: string, str: string)
 	local color = Logger[_type].Color or Color3.fromRGB(255, 255, 255);
 	local text_color = string.format("%d, %d, %d", color.R * 255, color.G * 255, color.B * 255);
 
-	Current_logs[log_id] = {	
+	current_logs[log_id] = {	
 		Icon = icon; Color = color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, _type, tostring(str), log_id) .. '</font>'
 	};
-	if Logger.ConsoleLogs then print(log_id); end;
+	if Logger.ConsoleLogs then new_print(log_id); end;
 	
 	if Logger.SaveLogs and isfile and readfile and writefile then
 
@@ -258,8 +260,8 @@ function Logger:CreateLoading(options: table)
 		return { Icon = icon; Color = loader_obj.Color; str = '<font color="rgb(' .. text_color .. ')">' .. string.format("[%s]: [%s] %s (%s)", log_date, loader_obj.Title, str, log_id) .. '</font>' };
 	end;
 
-	Current_logs[log_id] = UpdateLoadingText(true);
-	if Logger.ConsoleLogs then print(log_id); end;
+	current_logs[log_id] = UpdateLoadingText(true);
+	if Logger.ConsoleLogs then new_print(log_id); end;
 	
 	function loader_obj:SetTitle(str: string)
 		
@@ -292,7 +294,7 @@ function Logger:CreateLoading(options: table)
 		assert(typeof(step) == "number" and step == step, "Invalid Step number.");
 		loader_obj.TotalSteps = step;
 		
-		Current_logs[log_id] = UpdateLoadingText();
+		current_logs[log_id] = UpdateLoadingText();
 		return loader_obj;
 	end;
 	
@@ -301,7 +303,7 @@ function Logger:CreateLoading(options: table)
 		assert(typeof(step) == "number" and step == step, "Invalid Step number.");
 		loader_obj.CurrentStep = math.clamp(step, 0, loader_obj.TotalSteps);
 		
-		Current_logs[log_id] = UpdateLoadingText(loader_obj.CurrentStep >= loader_obj.TotalSteps);
+		current_logs[log_id] = UpdateLoadingText(loader_obj.CurrentStep >= loader_obj.TotalSteps);
 		return loader_obj;
 	end;
 	
@@ -351,7 +353,7 @@ getgenv().logger_conn = RunService.Heartbeat:Connect(function()
 
 		if not v:IsA("TextLabel") then continue; end;
 
-		for log_id, log_data in pairs(Current_logs) do
+		for log_id, log_data in pairs(current_logs) do
 
 			if not v.Text or not v.Text:find(log_id, 1, true) then continue; end;
 			
