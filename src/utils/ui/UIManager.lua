@@ -1,13 +1,18 @@
 local UICreator = {};
 
 local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
-luna_xyz_env.Library = Services:GetService("Library");
 
-luna_xyz_env.ThemeManager = Services:GetService("ThemeManager");
-luna_xyz_env.SaveManager = Services:GetService("SaveManager");
+luna_xyz_env.Library = luna_xyz_env:GetService("Library");
+local Notifications = luna_xyz_env:GetService("Notify");
+
+local ThemeManager = luna_xyz_env:GetService("ThemeManager");
+local SaveManager = luna_xyz_env:GetService("SaveManager");
 
 luna_xyz_env.Toggles = getgenv().Library.Toggles;
 luna_xyz_env.Options = getgenv().Library.Options;
+
+local HttpService = luna_xyz_env:GetService("HttpService");
+local Players = luna_xyz_env:GetService("Players");
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
@@ -88,18 +93,6 @@ function UICreator:CreateWindow()
 	luna_xyz_env.Library.ForceCheckbox = true; 
 	Logger.success("Main window loaded.");
 
-	----- || NOTIFICATIONS || -----
-
-	Logger.debug("Loading notifications module..");
-
-	luna_xyz_env.NotifyVolume = 2;
-	luna_xyz_env.NotifySound = true;
-
-	luna_xyz_env.NotifySoundID = 82845990304289;
-	luna_xyz_env.Notify = Services:GetService("Notify");
-
-	Logger.success("Notifications module loaded.");
-
 	----- || HOME || -----
 
 	Logger.debug("Creating home tab..");
@@ -119,10 +112,10 @@ function UICreator:CreateWindow()
 	AccountGroup:AddImage("MyImage", {
 
 		Height = 200;
-		Image = luna_xyz_env.Players:GetUserThumbnailAsync(luna_xyz_env.LP.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
+		Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
 	});
 
-	AccountGroup:AddLabel(GetGreeting() .. ', ' .. luna_xyz_env.LP.DisplayName .. ' - <b>Member</b>', true);
+	AccountGroup:AddLabel(GetGreeting() .. ', ' .. Players.LocalPlayer.DisplayName .. ' - <b>Member</b>', true);
 	AccountGroup:AddDivider();
 
 	AccountGroup:AddButton("Join Discord", function()
@@ -134,12 +127,12 @@ function UICreator:CreateWindow()
 
 		if not setclipboard then
 
-			luna_xyz_env.Notify:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	AccountGroup:AddButton({
@@ -150,12 +143,12 @@ function UICreator:CreateWindow()
 
 			if not setclipboard then
 
-				luna_xyz_env.Notify:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
+				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 				return;
 			end;
 
 			setclipboard("https://scriptblox.com/u/00_lxh");
-			luna_xyz_env.Notify:Notify("Copied Scriptblox link to clipboard!");
+			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
@@ -177,7 +170,7 @@ function UICreator:CreateWindow()
 	AnalyticsGroup:AddLabel('Exploit: <b>' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. '</b>', true);
 	AnalyticsGroup:AddLabel('Total Executions: <b>' .. luna_xyz_env.analytics_data.TotalExecutions .. '</b>', true);
 
-	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)]) .. '</b>', true);
+	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)]) .. '</b>', true);
 	
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
 	local startTime = os.clock();
@@ -187,11 +180,11 @@ function UICreator:CreateWindow()
 			
 			local elapsed = math.floor(os.clock() - startTime);
 
-			luna_xyz_env.time_elapsed = elapsed; luna_xyz_env.analytics_data.PlayTime[tostring(luna_xyz_env.LP)] = elapsed;
-			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:formatTime(luna_xyz_env.time_elapsed) .. '</b>');
+			luna_xyz_env.time_elapsed = elapsed; luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
+			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:FormatTime(luna_xyz_env.time_elapsed) .. '</b>');
 			
 			if luna_xyz_env.time_elapsed % 10 == 0 then
-				writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(luna_xyz_env.analytics_data));
+				writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(luna_xyz_env.analytics_data));
 			end;
 		end;
 	end);
@@ -212,7 +205,7 @@ function UICreator:CreateWindow()
 
 	luna_xyz_env.Library:OnUnload(function()
 
-		if Services:GetService("Cache") then Services:GetService("Cache"):Destroy(); end;
+		if luna_xyz_env:GetService("Cache") then luna_xyz_env:GetService("Cache"):Destroy(); end;
 		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:DoCleaning();
 		
 		luna_xyz_env.Library.Unloaded = true;
@@ -250,12 +243,12 @@ function UICreator:CreateTimeoutInfoTab()
 
 		if not setclipboard then
 
-			luna_xyz_env.Notify:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	ErrorInfoGroup:AddLabel("Timeout error usually means the game's owner has moved something to a different location which breaks the code that has already been written.\n\nPlease wait for the development team to fix this issue. If the issue persists, please contact us.", true);
@@ -308,8 +301,8 @@ function UICreator:CreateSettingsTab()
 		Text = "Custom Cursor";
 		Default = luna_xyz_env.Library.ShowCustomCursor;
 
-		Callback = function(Value)
-			luna_xyz_env.Library.ShowCustomCursor = Value;
+		Callback = function(value)
+			luna_xyz_env.Library.ShowCustomCursor = value;
 		end;
 	});
 
@@ -318,8 +311,8 @@ function UICreator:CreateSettingsTab()
 		Text = "Force Checkbox";
 		Default = luna_xyz_env.Library.ForceCheckbox;
 
-		Callback = function(Value)
-			luna_xyz_env.Library.ForceCheckbox = Value;
+		Callback = function(value)
+			luna_xyz_env.Library.ForceCheckbox = value;
 		end;
 	});
 
@@ -336,10 +329,10 @@ function UICreator:CreateSettingsTab()
 	MenuGroup:AddToggle("CreateLogs", {
 
 		Text = "Create Logs";
-		Default = true;
+		Default = (not isfile("luna_xyz/saves/save_logs.txt")) or (readfile("luna_xyz/saves/save_logs.txt") == "true");
 
-		Callback = function(Value)
-			luna_xyz_env.Library.ForceCheckbox = Value;
+		Callback = function(value)
+			writefile("luna_xyz/saves/save_logs.txt", tostring(value));
 		end;
 	});
 
@@ -354,46 +347,34 @@ function UICreator:CreateSettingsTab()
 
 		if not setclipboard then
 
-			luna_xyz_env.Notify:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	MenuGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
-	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
 
 	----- || UI || -----
 
 	UI_Tab:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
-
+	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
+	
 	UI_Tab:AddDropdown("DPIDropdown", {
-
+		
+		Text = "DPI Scale"; Default = "100%";
 		Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" };
-		Default = "100%";
 
-		Text = "DPI Scale";
+		Callback = function(value)
 
-		Callback = function(Value)
-
-			Value = Value:gsub("%%", "");
-			luna_xyz_env.Library:SetDPIScale(tonumber(Value));
+			value = value:gsub("%%", "");
+			luna_xyz_env.Library:SetDPIScale(tonumber(value));
 		end;
 	}); 
 
 	----- || NOTIFICATIONS || -----
-
-	NotificationsTab:AddToggle("PlayAlertSound", {
-
-		Text = "Play Alert Sound";
-		Default = true;
-
-		Callback = function(Value)
-			luna_xyz_env.NotifySound = Value;
-		end;
-	});
 
 	NotificationsTab:AddDropdown("NotificationSide", {
 
@@ -407,16 +388,44 @@ function UICreator:CreateSettingsTab()
 		end;
 	});
 
-	NotificationsTab:AddSlider("NotifyVolume", {
+	NotificationsTab:AddDropdown("NotificationStyle", {
+		
+		Text = "Notification Style"; Default = "luna.xyz";
+		Values = { "luna.xyz" };
 
-		Text = "Notify Volume";
+		Callback = function(value)
+
+			value = value:gsub("%%", "");
+			luna_xyz_env.Library:SetDPIScale(tonumber(value));
+		end;
+	});
+	
+	for i, v in pairs(Notifications:GetCustomNotifications()) do
+		
+		print(i, v);
+		--luna_xyz_env.Options.NotificationStyle:AddValues(i);
+	end;
+	
+	NotificationsTab:AddToggle("NotificationSound", {
+
+		Text = "Notification Sound";
+		Default = true;
+
+		Callback = function(value)
+			Notifications:ToggleSound(value);
+		end;
+	});
+
+	NotificationsTab:AddSlider("NotificationVolume", {
+
+		Text = "Notification Volume";
 		Compact = false;
 
-		Default = luna_xyz_env.NotifyVolume;
+		Default = Notifications.NotifyVolume;
 		Min = 0; Max = 5; Rounding = 1;
 
 		Callback = function(value)
-			luna_xyz_env.NotifyVolume = value;
+			Notifications:SetVolume(value);
 		end;
 	});
 
@@ -427,10 +436,10 @@ function UICreator:CreateSettingsTab()
 		Default = "rbxassetid://82845990304289"; Placeholder = "rbxassetid://82845990304289";
 		Numeric = false; Finished = true; ClearTextOnFocus = false;
 
-		Callback = function(Value)
+		Callback = function(value)
 
-			Value = Value:gsub("rbxassetid://", "");
-			luna_xyz_env.NotifySoundID = tonumber(Value);
+			value = value:gsub("rbxassetid://", "");
+			Notifications:SetSoundId(tonumber(value));
 		end;
 	});
 
@@ -439,7 +448,7 @@ function UICreator:CreateSettingsTab()
 	end);
 
 	NotificationsTab:AddButton("Test Notification", function()
-		luna_xyz_env.Notify:Notify("This is a test notification. You can change the sound settings above.");
+		Notifications:Notify("This is a test notification. You can change the sound settings above.");
 	end);
 
 	Logger.success("Settings tab created.");
@@ -448,11 +457,11 @@ function UICreator:CreateSettingsTab()
 
 	Logger.debug("Loading default theme..");
 
-	luna_xyz_env.ThemeManager:SetLibrary(luna_xyz_env.Library);
-	luna_xyz_env.SaveManager:SetLibrary(luna_xyz_env.Library);
+	ThemeManager:SetLibrary(luna_xyz_env.Library);
+	SaveManager:SetLibrary(luna_xyz_env.Library);
 
 	local __s, __d = pcall(function()
-		luna_xyz_env.ThemeManager:SetDefaultTheme({
+		ThemeManager:SetDefaultTheme({
 
 			BackgroundColor = Color3.fromRGB(15, 15, 15); MainColor = Color3.fromRGB(25, 25, 25);
 			AccentColor = Color3.fromRGB(255, 200, 76); OutlineColor = Color3.fromRGB(40, 40, 40);
@@ -468,16 +477,16 @@ function UICreator:CreateSettingsTab()
 
 	else Logger.success("Default theme loaded."); end;
 
-	luna_xyz_env.ThemeManager:ApplyToTab(SettingsTab);
+	ThemeManager:ApplyToTab(SettingsTab);
 	Logger.debug("Loading settings..");
 
-	luna_xyz_env.SaveManager:IgnoreThemeSettings();
-	luna_xyz_env.SaveManager:BuildConfigSection(SettingsTab);
+	SaveManager:IgnoreThemeSettings();
+	SaveManager:BuildConfigSection(SettingsTab);
 
-	luna_xyz_env.SaveManager:SetFolder("luna_xyz/saves/" .. luna_xyz_env.ScriptLoader);
-	luna_xyz_env.SaveManager:LoadAutoloadConfig();
+	SaveManager:SetFolder("luna_xyz/saves/" .. luna_xyz_env.ScriptLoader);
+	SaveManager:LoadAutoloadConfig();
 
-	luna_xyz_env.Maid:GiveTask(luna_xyz_env.LP.OnTeleport:Connect(function()
+	luna_xyz_env.Maid:GiveTask(Players.LocalPlayer.OnTeleport:Connect(function()
 
 		if not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or getgenv().queued_to_teleport then return; end;
 		getgenv().queued_to_teleport = true;
@@ -536,12 +545,12 @@ function UICreator:CreateCreditsTab()
 
 		if not setclipboard then
 
-			luna_xyz_env.Notify:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		luna_xyz_env.Notify:Notify("Copied discord link to clipboard!");
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	CommunitySection:AddButton({
@@ -552,12 +561,12 @@ function UICreator:CreateCreditsTab()
 
 			if not setclipboard then
 
-				luna_xyz_env.Notify:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
+				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 				return;
 			end;
 
 			setclipboard("https://scriptblox.com/u/00_lxh");
-			luna_xyz_env.Notify:Notify("Copied Scriptblox link to clipboard!");
+			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
