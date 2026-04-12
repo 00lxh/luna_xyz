@@ -1,94 +1,105 @@
 local FileManager, hash_cache = { FilesLoaded = false; }, {};
 
+luna_xyz_env._SupportsFileSystem = (isfile and writefile and delfile and readfile and listfiles and isfolder and makefolder and delfolder);
+local cloneref = (cloneref or function(instance: any) return instance end);
+
+local HttpService = cloneref(game:GetService("HttpService"));
+local Players = cloneref(game:GetService("Players"));
+
 if not luna_xyz_env._SupportsFileSystem then
-	
 	Logger.warn('The executor ' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. ' doesnt support file system, some features will be disabled.');
-	
-	getgenv().isfile = function(path)
-		
-		assert(path, "missing argument #1 to 'isfile' (string expected, got nil)");
-		return (FileManager[path] and FileManager[path].type == "file") or false;
+end;
+
+local isfile = isfile or function(path)
+
+	assert(path, "missing argument #1 to 'isfile' (string expected, got nil)");
+	return (FileManager[path] and FileManager[path].type == "file") or false;
+end;
+
+local writefile = writefile or function(path, content)
+
+	assert(path, "missing argument #1 to 'writefile' (string expected, got nil)");
+
+	if (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path), 0); end;
+	FileManager[path] = { type = "file"; contents = content; };
+end;
+
+local delfile = delfile or function(path)
+
+	assert(path, "missing argument #1 to 'delfile' (string expected, got nil)");
+
+	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path)); end;
+	FileManager[path] = nil;
+end;
+
+local readfile = readfile or function(path)
+
+	assert(path, "missing argument #1 to 'readfile' (string expected, got nil)");
+
+	local file = FileManager[path];
+	if not file or file.type == "folder" then error(("%s is not a valid file name"):format(path), 0)  end;
+
+	return file.contents;
+end;
+
+local loadfile = loadfile or function(path)
+
+	assert(path, "missing argument #1 to 'loadfile' (string expected, got nil)");
+	return loadstring(readfile(path));
+end;
+
+local listfiles = listfiles or function(path)
+
+	assert(path, "missing argument #1 to 'listfiles' (string expected, got nil)");
+
+	if path:sub(1, 3) == "./" then path = path:sub(4, -1); elseif path:sub(1, 2) == "." then path = path:sub(3, -1); end;
+	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
+
+	local result = {};
+
+	for v in FileManager do
+		if v:sub(1, #path) == path and v ~= path then table.insert(result, v); end;
 	end;
 
-	getgenv().writefile = function(path, content)
-		
-		assert(path, "missing argument #1 to 'writefile' (string expected, got nil)");
+	return result;
+end;
 
-		if (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path), 0); end;
-		FileManager[path] = { type = "file"; contents = content; };
-	end;
-	
-	getgenv().delfile = function(path)
-		
-		assert(path, "missing argument #1 to 'delfile' (string expected, got nil)");
+local isfolder = isfolder or function(path)
 
-		if not FileManager[path] or (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path)); end;
-		FileManager[path] = nil;
-	end;
-	
-	getgenv().readfile = function(path)
-		
-		assert(path, "missing argument #1 to 'readfile' (string expected, got nil)");
+	assert(path, "missing argument #1 to 'isfolder' (string expected, got nil)");
 
-		local file = FileManager[path];
-		if not file or file.type == "folder" then error(("%s is not a valid file name"):format(path), 0)  end;
+	if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
+	local folder = FileManager[path];
 
-		return file.contents;
-	end;
-	
-	getgenv().loadfile = function(path)
+	if not folder then return false; end;
+	return folder.type == "folder";
+end;
 
-		assert(path, "missing argument #1 to 'loadfile' (string expected, got nil)");
-		return loadstring(readfile(path));
-	end;
-	
-	getgenv().listfiles = function(path)
-		
-		assert(path, "missing argument #1 to 'listfiles' (string expected, got nil)");
+local makefolder = makefolder or function(path)
 
-		if path:sub(1, 3) == "./" then path = path:sub(4, -1); elseif path:sub(1, 2) == "." then path = path:sub(3, -1); end;
-		if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
+	assert(path, "missing argument #1 to 'makefolder' (string expected, got nil)");
 
-		local result = {};
+	if FileManager[path] then error(("%s is not a valid folder name"):format(path), 0); end;
+	if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
 
-		for v in FileManager do
-			if v:sub(1, #path) == path and v ~= path then table.insert(result, v); end;
-		end;
+	FileManager[path] = { type = "folder"; };
+end;
 
-		return result;
-	end;
-	
-	getgenv().isfolder = function(path)
-		
-		assert(path, "missing argument #1 to 'isfolder' (string expected, got nil)");
+local delfolder = delfolder or function(path)
 
-		if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
-		local folder = FileManager[path];
+	assert(path, "missing argument #1 to 'delfolder' (string expected, got nil)");
 
-		if not folder then return false; end;
-		return folder.type == "folder";
-	end;
-
-	getgenv().makefolder = function(path)
-		
-		assert(path, "missing argument #1 to 'makefolder' (string expected, got nil)");
-
-		if FileManager[path] then error(("%s is not a valid folder name"):format(path), 0); end;
-		if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
-
-		FileManager[path] = { type = "folder"; };
-	end;
-
-	getgenv().delfolder = function(path)
-		
-		assert(path, "missing argument #1 to 'delfolder' (string expected, got nil)");
-
-		if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
-		FileManager[path] = nil;
-	end;
+	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
+	FileManager[path] = nil;
 end;
 
 local modules_list = {
+	
+	{ name = "system", data = {
+
+		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },
+		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
+	}},
 	
 	{ name = "UI", data = {
 		
@@ -109,12 +120,6 @@ local modules_list = {
 		
 		{ name = "Fly", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua" },
 		{ name = "ESP", url = "https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau" },
-	}},
-
-	{ name = "system", data = {
-		
-		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },
-		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
 	}},
 
 	{ name = "HookService", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/HookService.lua" },
@@ -149,7 +154,7 @@ local luna_files = {
 local analytics_data_template = {
 
 	["executor"] = identifyexecutor();
-	["TotalExecutions"] = 0; ["PlayTime"] = { [tostring(luna_xyz_env.LP)] = 0; };
+	["TotalExecutions"] = 0; ["PlayTime"] = { [tostring(Players.LocalPlayer)] = 0; };
 };
 
 ----- || METHODS || -----
@@ -202,7 +207,7 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 		local startTime2 = os.time();
 
 		hash_cache[module_path] = { hash = remoteHash; url = module_data; time = os.time(); };
-		writefile("luna_xyz/hash_cache.json", luna_xyz_env.HttpService:JSONEncode(hash_cache));
+		writefile("luna_xyz/hash_cache.json", HttpService:JSONEncode(hash_cache));
 
 		writefile(local_file, __e);
 		Logger.info('Module ' .. module_path ..  '.lua updated. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
@@ -297,7 +302,7 @@ local startTime2 = os.time();
 Logger.debug("Fetching cache data..");
 
 if isfile("luna_xyz/hash_cache.json") then
-	hash_cache = luna_xyz_env.HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
+	hash_cache = HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
 end;
 
 Logger.success('Loaded cache data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
@@ -308,16 +313,16 @@ startTime2 = os.time();
 Logger.debug("Fetching analytics data..");
 
 if not isfile("luna_xyz/analytics/stats.json") then
-	writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(analytics_data_template));
+	writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data_template));
 end;
 
-local analytics_data = luna_xyz_env.HttpService:JSONDecode(readfile("luna_xyz/analytics/stats.json"));
+local analytics_data = HttpService:JSONDecode(readfile("luna_xyz/analytics/stats.json"));
 FileManager:MergeTables(analytics_data_template, analytics_data);
 
 analytics_data.TotalExecutions += 1;
 luna_xyz_env.analytics_data = analytics_data;
 
-writefile("luna_xyz/analytics/stats.json", luna_xyz_env.HttpService:JSONEncode(analytics_data));
+writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data));
 Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
 
 ----- || MODULES CHECK || -----
