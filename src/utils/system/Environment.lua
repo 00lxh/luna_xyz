@@ -1,23 +1,32 @@
+local CurrentCamera = workspace.CurrentCamera;
 local floor = math.floor;
 
-function luna_xyz_env:GetMousePosition()
+local cloneref = (cloneref or function(instance: any) return instance end);
 
-	if luna_xyz_env.UserInputService.TouchEnabled then
-		return Vector2.new(luna_xyz_env.Camera.ViewportSize.X / 2, luna_xyz_env.Camera.ViewportSize.Y / 2);
-	end;
+local coreGui = cloneref(game:GetService("CoreGui"));
+local gethui = (gethui or function() return coreGui; end);
 
-	return luna_xyz_env.UserInputService:GetMouseLocation() - luna_xyz_env.GuiService:GetGuiInset();
-end;
+local luna_cache = gethui():FindFirstChild("luna_cache") or Instance.new("Folder", gethui());
+luna_cache.Name = "luna_cache";
 
-function luna_xyz_env:GetMouseLocation()
+local UserInputService = cloneref(game:GetService("UserInputService"));
+local GuiService = cloneref(game:GetService("GuiService"));
 
-	local mouse_vector = luna_xyz_env:GetMousePosition();
+function luna_xyz_env:ParseBoolean(raw: any, default: boolean)
+	
+	if raw == nil then return default or false; end;
+	local str = tostring(raw):lower();
 
-	if luna_xyz_env.UserInputService.TouchEnabled then
-		return luna_xyz_env.Camera:ViewportPointToRay(mouse_vector.X, mouse_vector.Y);
-	end;
+	local trueValues = {
+		["true"] = true; ["t"] = true; ["1"] = true; ["yes"] = true; ["y"] = true; ["on"] = true; ["enable"] = true; ["enabled"] = true;
+	};
 
-	return luna_xyz_env.Camera:ScreenPointToRay(mouse_vector.X, mouse_vector.Y);
+	local falseValues = {
+		["false"] = true; ["f"] = true; ["0"] = true; ["no"] = true; ["n"] = true; ["off"] = true; ["disable"] = true; ["disabled"] = true;
+	};
+
+	if trueValues[str] then return true; elseif falseValues[str] then return false; end;
+	return default or false;
 end;
 
 function luna_xyz_env:IsValidGame(obj: any)
@@ -34,6 +43,42 @@ function luna_xyz_env:IsValidGame(obj: any)
 	return false;
 end;
 
+function luna_xyz_env:GetService(serviceName: string)
+
+	assert(serviceName, "Argument #1 missing or nil");
+	assert(typeof(serviceName) == "string", 'Invalid argument #1 to "GetService" (string expected, got ' .. typeof(serviceName) .. ')');
+
+	if serviceName:lower() == "cache" then return luna_cache; end;
+	if luna_xyz_env.loaded_libs[serviceName] then return luna_xyz_env.loaded_libs[serviceName]; end;
+
+	local service = cloneref(game:GetService(serviceName));
+	return service;
+end;
+
+function luna_xyz_env:GetServices(serviceNames: table)
+
+	assert(serviceNames, "Argument #1 missing or nil");
+	assert(typeof(serviceNames) == "table", 'Invalid argument #1 to "GetServices" (string expected, got ' .. typeof(serviceNames) .. ')');
+
+	for _, serviceName: string in ipairs(serviceNames) do
+		luna_xyz_env:GetService(serviceName);
+	end;
+end;
+
+function luna_xyz_env:GetMousePosition()
+
+	if UserInputService.TouchEnabled then return Vector2.new(CurrentCamera.ViewportSize.X / 2, CurrentCamera.ViewportSize.Y / 2); end;
+	return UserInputService:GetMouseLocation() - GuiService:GetGuiInset();
+end;
+
+function luna_xyz_env:GetMouseLocation()
+
+	local mouse_vector = luna_xyz_env:GetMousePosition();
+
+	if UserInputService.TouchEnabled then return CurrentCamera:ViewportPointToRay(mouse_vector.X, mouse_vector.Y); end;
+	return CurrentCamera:ScreenPointToRay(mouse_vector.X, mouse_vector.Y);
+end;
+
 function luna_xyz_env:IsString(str: string)
 	return typeof(str) == "string" and str:match("^%s*(.-)%s*$") ~= "";
 end;
@@ -42,11 +87,11 @@ function luna_xyz_env:IsNumber(num: number)
 	return typeof(num) == "number" and num == num;
 end;
 
-function luna_xyz_env:formatTime(t: number)
+function luna_xyz_env:FormatTime(t: number)
 	return string.format("%02d:%02d:%02d:%02d", floor(t / 86400), floor(t / 3600 % 24), floor(t / 60 % 60), floor(t % 60));
 end;
 
-function  luna_xyz_env:GetCharacter(player: Player)
+function luna_xyz_env:GetCharacter(player: Player)
 	return player.Character or player.CharacterAdded:Wait();
 end;
 
