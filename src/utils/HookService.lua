@@ -91,10 +91,10 @@ function HookingService:DisableConnection(Signal)
 	table.insert(signalFunctions, Signal);
 end;
 
-function HookingService:Destroy()
+function HookingService:DoCleaning()
 
 	for i, v in pairs(hookedFunctions) do
-		if ishooked and restorefunction and typeof(i) == "function" and typeof(v) == "function" and ishooked(i) then restorefunction(i); end;
+		if isfunctionhooked and restorefunction and typeof(i) == "function" and typeof(v) == "function" and isfunctionhooked(i) then restorefunction(i); end;
 		if hookmetamethod and typeof(i) == "function" and typeof(v) == "table" then hookmetamethod(game, v.__hook, v.__old); end;
 	end;
 
@@ -108,4 +108,5 @@ function HookingService:Destroy()
 	table.clear(signalFunctions);
 end;
 
+HookingService.Destroy = HookingService.DoCleaning;
 return HookingService;
