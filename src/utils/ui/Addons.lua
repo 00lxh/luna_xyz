@@ -2,18 +2,60 @@ local addons = {};
 local lastPosition = 1;
 
 local function CreateGroupboxProxy(AddonGroupbox)
-	
+
 	local actions = {};
 
-	local proxy = setmetatable({}, {
-		__index = function(_, method) return function(_, ...) table.insert(actions, { method, {...} }); end; end;
-	});
+	local function createFake()
+		
+		local fake = {};
 
+		setmetatable(fake, {
+			
+			__index = function(self, method)
+				return function(_, ...)
+
+					local newFake = createFake();
+					table.insert(actions, { type = "ObjectMethod"; object = self; method = method; args = {...}; returnObj = newFake; })
+
+					return newFake;
+				end;
+			end;
+		});
+
+		return fake;
+	end;
+	
+	local proxy = setmetatable({}, {
+		
+		__index = function(_, method)
+			return function(_, ...)
+
+				local fakeObject = createFake();
+
+				table.insert(actions, { type = "GroupboxMethod"; method = method; args = {...}; returnObj = fakeObject; });
+				return fakeObject;
+			end;
+		end;
+	});
+	
 	local function CommitUI()
 		for _, action in ipairs(actions) do
-			
-			local method, args = action[1], action[2];
-			if AddonGroupbox[method] then AddonGroupbox[method](AddonGroupbox, unpack(args)); end;
+
+			if action.type == "GroupboxMethod" then
+
+				local real = AddonGroupbox[action.method](AddonGroupbox, unpack(action.args));
+				if action.returnObj and type(real) == "table" then action.returnObj.__real = real; end;
+
+			elseif action.type == "ObjectMethod" then
+
+				local fake = action.object; local real = fake.__real;
+
+				if real and real[action.method] then
+					
+					local result = real[action.method](real, unpack(action.args));
+					if action.returnObj and type(result) == "table" then action.returnObj.__real = result; end;
+				end;
+			end;
 		end;
 	end;
 
