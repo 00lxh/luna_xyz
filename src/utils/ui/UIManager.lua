@@ -76,7 +76,6 @@ end;
 function UICreator:CreateWindow()
 
 	Logger.debug("Loading main window..");
-	luna_xyz_env.time_elapsed = 0;
 
 	local Window = luna_xyz_env.Library:CreateWindow({
 
@@ -127,12 +126,12 @@ function UICreator:CreateWindow()
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify("Copied discord link to clipboard!");
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 	end);
 
 	AccountGroup:AddButton({
@@ -140,15 +139,15 @@ function UICreator:CreateWindow()
 		Text = "Scriptblox Profile";
 
 		Func = function()
-
+			
 			if not setclipboard then
 
-				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
+				Notifications:Notify({ Description = "Scriptblox link: https://scriptblox.com/u/00_lxh"; Time = 10; });
 				return;
 			end;
 
-			setclipboard("https://scriptblox.com/u/00_lxh");
-			Notifications:Notify("Copied Scriptblox link to clipboard!");
+			setclipboard(luna_xyz_env.discord_id);
+			Notifications:Notify({ Description = "Copied Scriptblox link to clipboard!"; });
 		end;
 	});
 
@@ -180,10 +179,10 @@ function UICreator:CreateWindow()
 			
 			local elapsed = math.floor(os.clock() - startTime);
 
-			luna_xyz_env.time_elapsed = elapsed; luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
-			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:FormatTime(luna_xyz_env.time_elapsed) .. '</b>');
-			
-			if luna_xyz_env.time_elapsed % 10 == 0 then
+			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
+			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:FormatTime(elapsed) .. '</b>');
+
+			if (elapsed % 10) == 0 then
 				writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(luna_xyz_env.analytics_data));
 			end;
 		end;
@@ -243,12 +242,12 @@ function UICreator:CreateTimeoutInfoTab()
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify("Copied discord link to clipboard!");
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 	end);
 
 	ErrorInfoGroup:AddLabel("Timeout error usually means the game's owner has moved something to a different location which breaks the code that has already been written.\n\nPlease wait for the development team to fix this issue. If the issue persists, please contact us.", true);
@@ -344,15 +343,15 @@ function UICreator:CreateSettingsTab()
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
 
 	end):AddButton("Copy Link", function()
-
+		
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify("Copied discord link to clipboard!");
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 	end);
 
 	MenuGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
@@ -394,16 +393,12 @@ function UICreator:CreateSettingsTab()
 		Values = { "luna.xyz" };
 
 		Callback = function(value)
-
-			value = value:gsub("%%", "");
-			luna_xyz_env.Library:SetDPIScale(tonumber(value));
+			Notifications:SetNotifyTpe(value);
 		end;
 	});
 	
 	for i, v in pairs(Notifications:GetCustomNotifications()) do
-		
-		print(i, v);
-		--luna_xyz_env.Options.NotificationStyle:AddValues(i);
+		luna_xyz_env.Options.NotificationStyle:AddValues(i);
 	end;
 	
 	NotificationsTab:AddToggle("NotificationSound", {
@@ -448,7 +443,7 @@ function UICreator:CreateSettingsTab()
 	end);
 
 	NotificationsTab:AddButton("Test Notification", function()
-		Notifications:Notify("This is a test notification. You can change the sound settings above.");
+		Notifications:Notify({ Description = "This is a test notification. You can change the sound settings above."; });
 	end);
 
 	Logger.success("Settings tab created.");
@@ -545,12 +540,12 @@ function UICreator:CreateCreditsTab()
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify("Copied discord link to clipboard!");
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 	end);
 
 	CommunitySection:AddButton({
@@ -561,12 +556,12 @@ function UICreator:CreateCreditsTab()
 
 			if not setclipboard then
 
-				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
+				Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
 				return;
 			end;
 
-			setclipboard("https://scriptblox.com/u/00_lxh");
-			Notifications:Notify("Copied Scriptblox link to clipboard!");
+			setclipboard(luna_xyz_env.discord_id);
+			Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 		end;
 	});
 
