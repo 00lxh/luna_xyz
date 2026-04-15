@@ -153,7 +153,7 @@ function UICreator:CreateWindow()
 
 	for i, v in pairs(luna_xyz_env.supported_games) do
 
-		if v.GameId == 142823291 then continue; end;
+		if v == 142823291 then continue; end;
 
 		local placeName = i:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
 			return a:upper() .. b:lower();
