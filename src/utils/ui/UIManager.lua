@@ -86,7 +86,7 @@ function UICreator:CreateWindow()
 		Icon = "rbxassetid://5012126105";
 
 		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
-		NotifySide = "Right"; MenuFadeTime = 0; TabPadding = 2;
+		AutoShow = false; NotifySide = "Right"; MenuFadeTime = 0; TabPadding = 2;
 	});
 
 	luna_xyz_env.Library.ForceCheckbox = true; 
@@ -215,42 +215,6 @@ function UICreator:CreateWindow()
 	end);
 
 	return Window;
-end;
-
-function UICreator:CreateTimeoutInfoTab()
-
-	local ErrorTab = luna_xyz_env.Window:AddTab("Error", "triangle-alert");
-
-	ErrorTab:UpdateWarningBox({
-
-		Title = '<font size="20">luna.xyz - RUNTIME ERROR</font>', Visible = true;
-		Text = "\nluna.xyz was unable to load in time (<b>ERROR: timeout</b>)\n<i>If the error persists, please contact the development team.</i>";
-	});
-
-	local ResourcesGroup = ErrorTab:AddLeftGroupbox("Resources");
-	local ErrorInfoGroup = ErrorTab:AddRightGroupbox("Error Info");
-
-	ResourcesGroup:AddLabel('Discord link:\n' .. luna_xyz_env.discord_id, true);
-	ResourcesGroup:AddDivider();
-
-	ResourcesGroup:AddButton("Join Discord", function()
-
-		Inviter.Join(luna_xyz_env.discord_id);
-		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
-
-	end):AddButton("Copy Link", function()
-
-		if not setclipboard then
-
-			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
-			return;
-		end;
-
-		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
-	end);
-
-	ErrorInfoGroup:AddLabel("Timeout error usually means the game's owner has moved something to a different location which breaks the code that has already been written.\n\nPlease wait for the development team to fix this issue. If the issue persists, please contact us.", true);
 end;
 
 function UICreator:CreateSettingsTab()
