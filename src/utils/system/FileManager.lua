@@ -101,7 +101,7 @@ local modules_list = {
 		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
 	}},
 	
-	{ name = "UI", data = {
+	{ name = "ui", data = {
 		
 		{ name = "Library", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua" },
 		
