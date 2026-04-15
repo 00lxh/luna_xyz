@@ -1,349 +1,536 @@
-local FileManager, hash_cache = { FilesLoaded = false; }, {};
+local UICreator = {};
 
-luna_xyz_env._SupportsFileSystem = (isfile and writefile and delfile and readfile and listfiles and isfolder and makefolder and delfolder);
-local cloneref = (cloneref or function(instance: any) return instance end);
+local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
 
-local HttpService = cloneref(game:GetService("HttpService"));
-local Players = cloneref(game:GetService("Players"));
+luna_xyz_env.Library = luna_xyz_env:GetService("Library");
+local Notifications = luna_xyz_env:GetService("Notify");
 
-if not luna_xyz_env._SupportsFileSystem then
-	Logger.warn('The executor ' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. ' doesnt support file system, some features will be disabled.');
-end;
+local ThemeManager = luna_xyz_env:GetService("ThemeManager");
+local SaveManager = luna_xyz_env:GetService("SaveManager");
 
-local isfile = isfile or function(path)
+luna_xyz_env.Toggles = getgenv().Library.Toggles;
+luna_xyz_env.Options = getgenv().Library.Options;
 
-	assert(path, "missing argument #1 to 'isfile' (string expected, got nil)");
-	return (FileManager[path] and FileManager[path].type == "file") or false;
-end;
+local HttpService = luna_xyz_env:GetService("HttpService");
+local Players = luna_xyz_env:GetService("Players");
 
-local writefile = writefile or function(path, content)
-
-	assert(path, "missing argument #1 to 'writefile' (string expected, got nil)");
-
-	if (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path), 0); end;
-	FileManager[path] = { type = "file"; contents = content; };
-end;
-
-local delfile = delfile or function(path)
-
-	assert(path, "missing argument #1 to 'delfile' (string expected, got nil)");
-
-	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "folder") then error(("%s is not a valid file name"):format(path)); end;
-	FileManager[path] = nil;
-end;
-
-local readfile = readfile or function(path)
-
-	assert(path, "missing argument #1 to 'readfile' (string expected, got nil)");
-
-	local file = FileManager[path];
-	if not file or file.type == "folder" then error(("%s is not a valid file name"):format(path), 0)  end;
-
-	return file.contents;
-end;
-
-local loadfile = loadfile or function(path)
-
-	assert(path, "missing argument #1 to 'loadfile' (string expected, got nil)");
-	return loadstring(readfile(path));
-end;
-
-local listfiles = listfiles or function(path)
-
-	assert(path, "missing argument #1 to 'listfiles' (string expected, got nil)");
-
-	if path:sub(1, 3) == "./" then path = path:sub(4, -1); elseif path:sub(1, 2) == "." then path = path:sub(3, -1); end;
-	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
-
-	local result = {};
-
-	for v in FileManager do
-		if v:sub(1, #path) == path and v ~= path then table.insert(result, v); end;
-	end;
-
-	return result;
-end;
-
-local isfolder = isfolder or function(path)
-
-	assert(path, "missing argument #1 to 'isfolder' (string expected, got nil)");
-
-	if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
-	local folder = FileManager[path];
-
-	if not folder then return false; end;
-	return folder.type == "folder";
-end;
-
-local makefolder = makefolder or function(path)
-
-	assert(path, "missing argument #1 to 'makefolder' (string expected, got nil)");
-
-	if FileManager[path] then error(("%s is not a valid folder name"):format(path), 0); end;
-	if path:sub(-1, -1) == "/" then path = path:sub(1, #path - 1); end;
-
-	FileManager[path] = { type = "folder"; };
-end;
-
-local delfolder = delfolder or function(path)
-
-	assert(path, "missing argument #1 to 'delfolder' (string expected, got nil)");
-
-	if not FileManager[path] or (FileManager[path] and FileManager[path].type == "file") then error(("%s is not a valid folder name"):format(path)); end;
-	FileManager[path] = nil;
-end;
-
-local modules_list = {
-	
-	{ name = "system", data = {
-
-		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },
-		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
-	}},
-	
-	{ name = "ui", data = {
-		
-		{ name = "Library", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/Library.lua" },
-		
-		{ name = "ThemeManager", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/ThemeManager.lua" },
-		{ name = "SaveManager", url = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/addons/SaveManager.lua" },
-		
-		{ name = "Notify", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Notify.lua" },
-		{ name = "UIManager", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/UIManager.lua" },
-		
-		{ name = "Addons", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/ui/Addons.lua" },
-	}},
-
-	{ name = "universal", data = {
-		
-		{ name = "ControlModule", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/ControlModule.lua" },
-		
-		{ name = "Fly", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/universal/Fly.lua" },
-		{ name = "ESP", url = "https://raw.githubusercontent.com/mstudio45/MSESP/refs/heads/main/source.luau" },
-	}},
-
-	{ name = "HookService", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/HookService.lua" },
-	
-	{ name = "Signal", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Signal.lua" },
-	{ name = "Maid", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/Maid.lua" },
-}
-
-local luna_files = {
-
-	["addons"] = {}; ["analytics"] = {};
-	["assets"] = {}; ["saves"] = {};
-
-	["core"] = {
-		["WARNING.txt"] = { _t = "file"; content = "WARNING:\nDO NOT DELETE THESE FILES!\n\nThis may have unexpected consequences and may break your linked key if you have one. Only use the 'Erase Local Files' button if you need these to be erased.\n\n- Thank you <3!"; };
-	};
-
-	["logs"] = {
-		["NOTICE.txt"] = { _t = "file"; content = "WARNING:\nDo NOT share these logs with anyone other than the developers.\n\nThey may contain sensitive information such as but not limited to: Username, HWID, and Security Tokens.\nThese logs are crash reports and are only helpful to the developers. You may delete these if needed. Logs older than 10 days are automatically deleted.\n\n- Thank you <3!"; };
-	};
-
-	["utils"] = {
-
-		["ui"] = { _t = "folder"; content = {}; };
-		["universal"] = { _t = "folder"; content = {}; };
-
-		["system"] = { _t = "folder"; content = {}; };
-		["WARNING.txt"] = { _t = "file"; content = "WARNING:\nDO NOT DELETE THESE FILES!\n\nThis may have unexpected consequences and may cause luna.xyz to stop working. Only use the 'Erase Local Files' button if you need these to be erased.\n\n- Thank you <3!"; };
-	};
+local moonFunFacts = {
+	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
+	"The same side of the Moon always faces Earth due to tidal locking.";
+	"A day on the Moon (sunrise to sunrise) lasts about 29.5 Earth days.";
+	"The Moon has moonquakes, some caused by Earth's gravity.";
+	"Footprints left on the Moon can last for millions of years due to no atmosphere.";
+	"The Moon has no atmosphere, so there is no weather or wind.";
+	"The far side of the Moon was first seen by humans in 1959.";
+	"The Moon is the fifth largest moon in the solar system.";
+	"The Moon's gravity is about one-sixth of Earth's gravity.";
+	"There is water ice on the Moon, especially in permanently shadowed craters.";
+	"The Moon was formed about 4.5 billion years ago after a giant impact.";
+	"The Moon helps stabilize Earth's rotation and climate.";
+	"Temperatures on the Moon can range from about -173°C to 127°C.";
+	"The Moon has mountains higher than Mount Everest.";
+	"Astronauts brought back about 382 kilograms of Moon rocks.";
+	"The Moon has a very weak magnetic field compared to Earth.";
+	"The Moon causes tides in Earth's oceans.";
+	"The first human landing on the Moon was in 1969";
+	"The Moon reflects sunlight, it does not produce its own light.";
+	"There are no sounds on the Moon because there is no air.";
+	"The Moon is slowly becoming tidally locked more strongly over time, stabilizing its rotation even further.";
+	"The Moon has a diameter of about 3,474 kilometers, roughly one-quarter the size of Earth.";
+	"The Moon’s surface is covered in a fine dust called regolith.";
+	"There are over 1,600 named craters on the Moon.";
+	"The largest crater on the Moon is the South Pole–Aitken basin.";
+	"The Moon has no liquid water on its surface due to lack of atmosphere and pressure.";
+	"The Moon experiences extreme temperature changes because it lacks an atmosphere.";
+	"The Moon’s orbit around Earth takes about 27.3 days (sidereal month).";
+	"The Moon appears larger near the horizon due to the Moon illusion.";
+	"The Moon has 'seas' called maria, which are actually solidified lava plains.";
+	"The Moon's core is very small compared to Earth's core.";
+	"The Moon has been visited by 12 astronauts in total.";
+	"The Moon’s gravity affects not only oceans but also Earth’s crust slightly.";
+	"The Moon has tiny amounts of an atmosphere called an exosphere.";
+	"The Moon is gradually slowing Earth's rotation over millions of years.";
+	"The Moon’s surface is darker than it appears, similar to worn asphalt.";
+	"The Moon has no protection from space radiation or meteorites.";
+	"Some craters on the Moon have never seen sunlight.";
+	"The Moon was once much closer to Earth and appeared larger in the sky.";
+	"The Moon helps create eclipses when it aligns with Earth and the Sun.";
 };
 
-local analytics_data_template = {
+local function GetGreeting()
 
-	["executor"] = identifyexecutor();
-	["TotalExecutions"] = 0; ["PlayTime"] = { [tostring(Players.LocalPlayer)] = 0; };
-};
+	local hour = os.date("*t").hour;
 
------ || METHODS || -----
+	if hour >= 5 and hour < 12 then
 
-function FileManager:GetHash(str: string)
+		return "Good morning";
 
-	local hash = 2166136261;
+	elseif hour >= 12 and hour < 19 then
 
-	for i = 1, #str do
-
-		hash = bit32.bxor(hash, string.byte(str, i));
-		hash = (hash * 16777619) % 2^32;
+		return "Good afternoon";
 	end;
 
-	return string.format("%08x", hash);
+	return "Good evening";
 end;
 
-function FileManager:MergeTables(default, current)
-	
-	for key, value in pairs(default) do
-		if current[key] == nil then current[key] = value; elseif typeof(value) == "table" and typeof(current[key]) == "table" then		
-			FileManager:MergeTables(value, current[key]);
+function UICreator:CreateWindow()
+
+	Logger.debug("Loading main window..");
+
+	local Window = luna_xyz_env.Library:CreateWindow({
+
+		Title = "luna.xyz";
+		Footer = 'Game: ' .. luna_xyz_env.ScriptName .. ' | Game Build: ' .. tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]) .. ' | Loader Build: ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. ' | Made by 00._lxh';
+
+		IconSize = UDim2.fromOffset(20, 20);
+		Icon = "rbxassetid://5012126105";
+
+		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
+		AutoShow = false; NotifySide = "Right"; MenuFadeTime = 0; TabPadding = 2;
+	});
+
+	luna_xyz_env.Library.ForceCheckbox = true; 
+	Logger.success("Main window loaded.");
+
+	----- || HOME || -----
+
+	Logger.debug("Creating home tab..");
+	local HomeTab = Window:AddTab("Home", "house");
+
+	HomeTab:UpdateWarningBox({
+
+		Title = '<font size="20">Welcome to <font color="rgb(255, 200, 76)">luna.xyz</font></font>!', Visible = true; IsNormal = true;
+		Text = '\n<b>Moon fun fact:\n</b>' .. moonFunFacts[math.random(1, #moonFunFacts)];
+	});
+
+	local AccountGroup = HomeTab:AddLeftGroupbox("Account", "circle-user-round");
+
+	local ScriptStatusGroup = HomeTab:AddRightGroupbox("Script Status", "scroll");
+	local AnalyticsGroup = HomeTab:AddRightGroupbox("Analytics", "chart-no-axes-combined");
+
+	AccountGroup:AddImage("MyImage", {
+
+		Height = 200;
+		Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
+	});
+
+	AccountGroup:AddLabel(GetGreeting() .. ', ' .. Players.LocalPlayer.DisplayName .. ' - <b>Member</b>', true);
+	AccountGroup:AddDivider();
+
+	AccountGroup:AddButton("Join Discord", function()
+
+		Inviter.Join(luna_xyz_env.discord_id);
+		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
+
+	end):AddButton("Copy Link", function()
+
+		if not setclipboard then
+
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			return;
 		end;
+
+		setclipboard(luna_xyz_env.discord_id);
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+	end);
+
+	AccountGroup:AddButton({
+
+		Text = "Scriptblox Profile";
+
+		Func = function()
+			
+			if not setclipboard then
+
+				Notifications:Notify({ Description = "Scriptblox link: https://scriptblox.com/u/00_lxh"; Time = 10; });
+				return;
+			end;
+
+			setclipboard(luna_xyz_env.discord_id);
+			Notifications:Notify({ Description = "Copied Scriptblox link to clipboard!"; });
+		end;
+	});
+
+	for i, v in pairs(luna_xyz_env.supported_games) do
+
+		if v == 142823291 then continue; end;
+
+		local placeName = i:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
+			return a:upper() .. b:lower();
+		end);
+
+		local text_color = (game.PlaceId == v or game.GameId == v) and "66, 149, 245" or "255, 255, 255";
+		ScriptStatusGroup:AddLabel('[🟢] <b><font color="rgb(' .. text_color  .. ')">' .. placeName .. '</font></b>', true);
 	end;
+
+	ScriptStatusGroup:AddDivider();
+	ScriptStatusGroup:AddLabel('<b>Join our official Discord server to see a detailed log of updates and the status of the scripts!</b>', true);
+
+	AnalyticsGroup:AddLabel('Exploit: <b>' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. '</b>', true);
+	AnalyticsGroup:AddLabel('Total Executions: <b>' .. luna_xyz_env.analytics_data.TotalExecutions .. '</b>', true);
+
+	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)]) .. '</b>', true);
+	
+	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
+	local startTime = os.clock();
+
+	task.spawn(function()
+		while task.wait(1) and luna_xyz_env do
+			
+			local elapsed = math.floor(os.clock() - startTime);
+
+			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
+			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:FormatTime(elapsed) .. '</b>');
+
+			if (elapsed % 10) == 0 then
+				writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(luna_xyz_env.analytics_data));
+			end;
+		end;
+	end);
+
+	Logger.success("Home tab created.");
+
+	----- || FUNCITONS CHECK || -----
+
+	luna_xyz_env.CheckToggle = function(toggleName: string, value: boolean)
+		return luna_xyz_env.Toggles[toggleName] and luna_xyz_env.Toggles[toggleName].Value == value;
+	end;
+
+	luna_xyz_env.CheckOption = function(optionName: string, value: any)
+		return luna_xyz_env.Options[optionName] and (typeof(luna_xyz_env.Options[optionName].Value) == "table" and luna_xyz_env.Options[optionName].Value[value] or luna_xyz_env.Options[optionName].Value == value);
+	end;
+
+	----- || UNLOAD HANDLER || -----
+
+	luna_xyz_env.Library:OnUnload(function()
+
+		if luna_xyz_env:GetService("Cache") then luna_xyz_env:GetService("Cache"):Destroy(); end;
+		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:DoCleaning();
+		
+		luna_xyz_env.Library.Unloaded = true;
+		mstudio45_ESP:Destroy();
+
+		getgenv().luna_xyz_env = nil; getgenv().luna_xyz_addons = nil;
+		getgenv().luna_xyz_loading = nil; getgenv().luna_xyz_loaded = nil;
+	end);
+
+	return Window;
 end;
 
-function FileManager:LoadModule(module_path: string, module_data: string)
+function UICreator:CreateSettingsTab()
+
+	Logger.debug("Creating settings tab..");
+	local SettingsTab = luna_xyz_env.Window:AddTab("Settings", "cog");
+
+	if not luna_xyz_env._SupportsFileSystem then
+
+		SettingsTab:UpdateWarningBox({
+
+			Title = '<font size="20">luna.xyz - FileSystem API ERROR</font>', Visible = true;
+			Text = "\nluna.xyz was unable to save settings and custom themes (<b>ERROR: FileSystem API</b>)\n<i>If the error persists, please contact the development team.</i>";
+		});
+	end;
+
+	local MenuGroup = SettingsTab:AddLeftGroupbox("Menu Options", "cog");
+	local UIGroup = SettingsTab:AddRightTabbox("UI");
+
+	local UI_Tab = UIGroup:AddTab("UI", "app-window");
+	local NotificationsTab = UIGroup:AddTab("Notify", "bell");
+
+	----- || MENU || -----
+
+	MenuGroup:AddToggle("ToggleWaterMark", {
+
+		Text = "Toggle Watermark";
+		Default = true;
+
+		Callback = function(value)
+
+		end;
+	});
+
+	MenuGroup:AddToggle("KeybindMenuOpen", {
+
+		Default = luna_xyz_env.Library.KeybindFrame.Visible;
+		Text = "Open Keybind Menu";
+
+		Callback = function(value)
+			luna_xyz_env.Library.KeybindFrame.Visible = value;
+		end;
+	});
+
+	MenuGroup:AddToggle("ShowCustomCursor", {
+
+		Text = "Custom Cursor";
+		Default = luna_xyz_env.Library.ShowCustomCursor;
+
+		Callback = function(value)
+			luna_xyz_env.Library.ShowCustomCursor = value;
+		end;
+	});
+
+	MenuGroup:AddToggle("ForceCheckbox", {
+
+		Text = "Force Checkbox";
+		Default = luna_xyz_env.Library.ForceCheckbox;
+
+		Callback = function(value)
+			luna_xyz_env.Library.ForceCheckbox = value;
+		end;
+	});
+
+	MenuGroup:AddDivider();
+
+	MenuGroup:AddToggle("DiscordRichPresence", {
+		Text = "Discord Rich Presence"; Default = false;
+	});
+
+	MenuGroup:AddToggle("ExecuteOnTeleport", {
+		Text = "Execute on Teleport"; Default = false;
+	});
 	
-	local startTime = os.time();
-	Logger.debug('Checking module: ' .. module_path .. '.lua');
+	MenuGroup:AddToggle("CreateLogs", {
 
-	local local_file = 'luna_xyz/utils/'.. module_path .. '.lua';
-	local cache  = hash_cache[module_path];
+		Text = "Create Logs";
+		Default = (not isfile("luna_xyz/saves/save_logs.txt")) or (readfile("luna_xyz/saves/save_logs.txt") == "true");
 
-	local __s, __d = pcall(game.HttpGet, game, module_data);
+		Callback = function(value)
+			writefile("luna_xyz/saves/save_logs.txt", tostring(value));
+		end;
+	});
 
-	if not __s then
+	MenuGroup:AddDivider();
 
-		Logger.error('Failed to fetch module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
+	MenuGroup:AddButton("Join Discord", function()
 
-		return;
+		Inviter.Join(luna_xyz_env.discord_id);
+		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
+
+	end):AddButton("Copy Link", function()
+		
+		if not setclipboard then
+
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			return;
+		end;
+
+		setclipboard(luna_xyz_env.discord_id);
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+	end);
+
+	MenuGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
+
+	----- || UI || -----
+
+	UI_Tab:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
+	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
+	
+	UI_Tab:AddDropdown("DPIDropdown", {
+		
+		Text = "DPI Scale"; Default = "100%";
+		Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" };
+
+		Callback = function(value)
+
+			value = value:gsub("%%", "");
+			luna_xyz_env.Library:SetDPIScale(tonumber(value));
+		end;
+	}); 
+
+	----- || NOTIFICATIONS || -----
+
+	NotificationsTab:AddDropdown("NotificationSide", {
+
+		Values = { "Left", "Right" };
+		Default = "Right";
+
+		Text = "Notification Side";
+
+		Callback = function(Value)
+			luna_xyz_env.Library:SetNotifySide(Value);
+		end;
+	});
+
+	NotificationsTab:AddDropdown("NotificationStyle", {
+		
+		Text = "Notification Style"; Default = "luna.xyz";
+		Values = { "luna.xyz" };
+
+		Callback = function(value)
+			Notifications:SetNotifyTpe(value);
+		end;
+	});
+	
+	for i, v in pairs(Notifications:GetCustomNotifications()) do
+		luna_xyz_env.Options.NotificationStyle:AddValues(i);
 	end;
+	
+	NotificationsTab:AddToggle("NotificationSound", {
 
-	local remoteHash = FileManager:GetHash(__d);
-	local needsUpdate = not cache or cache.hash ~= remoteHash or cache.url ~= module_data or not isfile(local_file);
+		Text = "Notification Sound";
+		Default = true;
 
-	if needsUpdate then
+		Callback = function(value)
+			Notifications:ToggleSound(value);
+		end;
+	});
 
-		local startTime2 = os.time();
+	NotificationsTab:AddSlider("NotificationVolume", {
 
-		hash_cache[module_path] = { hash = remoteHash; url = module_data; time = os.time(); };
-		writefile("luna_xyz/hash_cache.json", HttpService:JSONEncode(hash_cache));
+		Text = "Notification Volume";
+		Compact = false;
 
-		writefile(local_file, __d);
-		Logger.info('Module ' .. module_path ..  '.lua updated. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-	end;
+		Default = Notifications.NotifyVolume;
+		Min = 0; Max = 5; Rounding = 1;
+
+		Callback = function(value)
+			Notifications:SetVolume(value);
+		end;
+	});
+
+	NotificationsTab:AddInput("NotificationSoundID", {
+
+		Text = "Notification Sound ID";
+
+		Default = "rbxassetid://82845990304289"; Placeholder = "rbxassetid://82845990304289";
+		Numeric = false; Finished = true; ClearTextOnFocus = false;
+
+		Callback = function(value)
+
+			value = value:gsub("rbxassetid://", "");
+			Notifications:SetSoundId(tonumber(value));
+		end;
+	});
+
+	NotificationsTab:AddButton("Reset Sound to Default", function()	
+		luna_xyz_env.Library.Options.NotificationSoundID:SetValue("rbxassetid://82845990304289");
+	end);
+
+	NotificationsTab:AddButton("Test Notification", function()
+		Notifications:Notify({ Description = "This is a test notification. You can change the sound settings above."; });
+	end);
+
+	Logger.success("Settings tab created.");
+
+	----- || SETTINGS || -----
+
+	Logger.debug("Loading default theme..");
+
+	ThemeManager:SetLibrary(luna_xyz_env.Library);
+	SaveManager:SetLibrary(luna_xyz_env.Library);
 
 	local __s, __d = pcall(function()
-		return loadfile(local_file)();
+		ThemeManager:SetDefaultTheme({
+
+			BackgroundColor = Color3.fromRGB(15, 15, 15); MainColor = Color3.fromRGB(25, 25, 25);
+			AccentColor = Color3.fromRGB(255, 200, 76); OutlineColor = Color3.fromRGB(40, 40, 40);
+
+			FontColor = Color3.new(1, 1, 1); FontFace = Enum.Font.Code;
+		});
 	end);
 
 	if not __s then
 
-		Logger.error('Failed to load module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+		Logger.error("Failed to load Default theme");
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
-		return;
-	end;
+	else Logger.success("Default theme loaded."); end;
 
-	luna_xyz_env.loaded_libs[module_path:match(".+/(.+)") or module_path] = __d;
-	Logger.success('The module ' .. module_path .. '.lua loaded successfully. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	ThemeManager:ApplyToTab(SettingsTab);
+	Logger.debug("Loading settings..");
+
+	SaveManager:IgnoreThemeSettings();
+	SaveManager:BuildConfigSection(SettingsTab);
+
+	SaveManager:SetFolder("luna_xyz/saves/" .. luna_xyz_env.ScriptLoader);
+	SaveManager:LoadAutoloadConfig();
+
+	luna_xyz_env.Maid:GiveTask(Players.LocalPlayer.OnTeleport:Connect(function()
+
+		if not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or getgenv().queued_to_teleport then return; end;
+		getgenv().queued_to_teleport = true;
+
+		--queue_on_teleport([[ loadstring(game:HttpGet("https://github.com/notpoiu/mspaint/releases/latest/download/Script.luau"))() ]]);
+	end));
+
+	Logger.success("All settings loaded.");
+	return SettingsTab;
 end;
 
------ || FILE CHECK || -----
+function UICreator:CreateCreditsTab()
 
-local startTime = os.time();
-Logger.debug("Checking files integrity..");
+	Logger.debug("Creating credits tab..");
+	local CreditsTab = luna_xyz_env.Window:AddTab("Credits", "users");
 
-for folder_name, folder_data in pairs(luna_files) do
+	local OwnersSection = CreditsTab:AddLeftGroupbox("Owners", "moon");
 
-	if #folder_data == 0 then
+	--local DevelopersSection = CreditsTab:AddLeftGroupbox("Developers", "scroll");
+	local TestersSection = CreditsTab:AddLeftGroupbox("Testers", "flask-conical");
 
-		if isfolder('luna_xyz/' .. tostring(folder_name)) then continue; end;
-		makefolder('luna_xyz/' .. tostring(folder_name));
-		
-		Logger.debug('The folder "luna_xyz/' .. tostring(folder_name) .. '" was not found, Creaitng a new one..');
-	end;
+	local ContributorsSection = CreditsTab:AddRightGroupbox("Contributors", "puzzle");
+	local CommunitySection = CreditsTab:AddRightGroupbox("Community", "message-circle");
 
-	for file_name, file_data in pairs(folder_data) do
+	----- || OWNERS || -----
 
-		if file_data._t == "folder" and not isfolder('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name)) then
+	OwnersSection:AddLabel('[<font color="rgb(255, 200, 76)">00._lxh</font>] - Owner of luna.xyz', true);
 
-			makefolder('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name));
-			Logger.debug('The folder "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '" was not found, Creaitng a new one..');
+	----- || DEVELOPERS || ----
 
-			for a, b in pairs(file_data.content) do
+	----- || TESTERS || -----
 
-				writefile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a), tostring(b));
-				if isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a)) then continue; end;
-				
-				Logger.debug('The file "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a) .. '" was not found, Creaitng a new one..');
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of rakoof, project lazarus', true);
+
+	----- || CONTRIBUTORS || -----
+
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with rakoof, rake remastered, project lazarus', true);
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">Ryo Yamada</font>] - Helped with revenant sunrisen', true);
+
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">deividcomsono</font>] - Obsidian UI library developer', true);
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">mspaint</font>] - Inspiration for the new version of luna.xyz', true);
+
+	ContributorsSection:AddLabel('[<font color="rgb(255, 102, 204)">You</font>] - Thanks for all the support and for using my script', true);
+
+	----- || COMMUNITY || -----
+
+	CommunitySection:AddLabel('Official luna.xyz socials', true);
+
+	CommunitySection:AddButton("Join Discord", function()
+
+		Inviter.Join(luna_xyz_env.discord_id);
+		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
+
+	end):AddButton("Copy Link", function()
+
+		if not setclipboard then
+
+			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			return;
+		end;
+
+		setclipboard(luna_xyz_env.discord_id);
+		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+	end);
+
+	CommunitySection:AddButton({
+
+		Text = "Scriptblox Profile";
+
+		Func = function()
+
+			if not setclipboard then
+
+				Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+				return;
 			end;
 
-		elseif file_data._t == "file" and not isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name)) then
-
-			writefile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name), tostring(file_data.content));
-			if isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name), tostring(file_data.content)) then continue; end;
-			
-			Logger.debug('The file "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '" was not found, Creaitng a new one..');
+			setclipboard(luna_xyz_env.discord_id);
+			Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
 		end;
-	end;
+	});
+
+	Logger.success("Credits tab created.");
+	return CreditsTab;
 end;
 
-for _, file_path in pairs(listfiles("luna_xyz/logs")) do
-
-	local startTime2 = os.time();
-
-	local filename = tostring(file_path):match("([^\\]+)$");
-	filename = filename:match("(.+)%..+$");
-
-	local months, days, years = filename:match("(%d+)%-(%d+)%-(%d+)");
-	if not(months or days or years) then continue; end;
-
-	local fileTime = os.time({ year = years, month = months, day = days });
-	local difference = os.difftime(os.time(), fileTime);
-
-	local delete_days = 10;
-	if not (difference >= (delete_days * 24 * 60 * 60)) then continue; end;
-
-	Logger.warn('Deleting log file "' .. tostring(file_path):gsub("\\", "/") .. '" because is 10 days old. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-	delfile(file_path);
-end;
-
-if not isfile("luna_xyz/whaaaattt.mp3") and (crypt and crypt.base64decode) then
-	writefile("luna_xyz/whaaaattt.mp3", crypt.base64decode(game:HttpGet("https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/assets/whaaaattt.txt")));
-end;
-
-if isfolder("luna_xyz/modules") then delfolder("luna_xyz/modules"); end;
-Logger.success('Files integrity good. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-
------ || CACHE CHECK || -----
-
-local startTime2 = os.time();
-Logger.debug("Fetching cache data..");
-
-if isfile("luna_xyz/hash_cache.json") then
-	hash_cache = HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
-end;
-
-Logger.success('Loaded cache data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-
------ || ANALITYCS CHECK || -----
-
-startTime2 = os.time();
-Logger.debug("Fetching analytics data..");
-
-if not isfile("luna_xyz/analytics/stats.json") then
-	writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data_template));
-end;
-
-local analytics_data = HttpService:JSONDecode(readfile("luna_xyz/analytics/stats.json"));
-FileManager:MergeTables(analytics_data_template, analytics_data);
-
-analytics_data.TotalExecutions += 1;
-luna_xyz_env.analytics_data = analytics_data;
-
-writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data));
-Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-
------ || MODULES CHECK || -----
-
-startTime = os.time();
-Logger.debug("Fetching luna.xyz modules..");
-
-for _, module in ipairs(modules_list) do
-
-	if not module.data then
-		
-		FileManager:LoadModule(module.name, module.url);
-		continue;
-	end;
-	
-	for _, sub in ipairs(module.data) do
-		FileManager:LoadModule(module.name .. '/' .. sub.name, sub.url)
-	end;
-end;
-
-Logger.success('Loaded luna.xyz modules. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
-FileManager.FilesLoaded = true;
-
-return FileManager;
+return UICreator;
