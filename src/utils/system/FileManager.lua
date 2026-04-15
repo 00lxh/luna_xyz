@@ -143,7 +143,7 @@ local luna_files = {
 
 	["utils"] = {
 
-		["UI"] = { _t = "folder"; content = {}; };
+		["ui"] = { _t = "folder"; content = {}; };
 		["universal"] = { _t = "folder"; content = {}; };
 
 		["system"] = { _t = "folder"; content = {}; };
