@@ -159,7 +159,7 @@ function UICreator:CreateWindow()
 			return a:upper() .. b:lower();
 		end);
 
-		local text_color = (game.PlaceId == v.GameId or game.GameId == v.GameId) and "66, 149, 245" or "255, 255, 255";
+		local text_color = (game.PlaceId == v or game.GameId == v) and "66, 149, 245" or "255, 255, 255";
 		ScriptStatusGroup:AddLabel('[🟢] <b><font color="rgb(' .. text_color  .. ')">' .. placeName .. '</font></b>', true);
 	end;
 
