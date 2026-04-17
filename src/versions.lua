@@ -1,10 +1,10 @@
-return {
+local versions = {
 
-	["luna_xyz_loader"] = "v7.0.0";
-	
-	["the_rakoof"] = "v2.3.1";
-	["rake_remastered"] = "v1.2.3";
-	
-	["project_lazarus"] = "v1.0.0";
-	["murder_muystery_2"] = "v1.0.0";
+	["luna_hub"] = "v7.2.5";
+	["rakoof"] = "v3.2.1";
+
+	["rake_remastered"] = "v2.2.1";
+	["revenant_sunrisen"] = "v2.3.2";
 };
+
+return versions;
