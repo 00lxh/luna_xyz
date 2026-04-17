@@ -91,6 +91,14 @@ function HookingService:DisableConnection(Signal)
 	table.insert(signalFunctions, Signal);
 end;
 
+function HookingService:EnableConnection(Signal)
+
+	if not getconnections then return; end;
+
+	for _, v in next, getconnections(Signal) do v:Enable(); end;
+	table.remove(signalFunctions, table.find(signalFunctions, Signal));
+end;
+
 function HookingService:DoCleaning()
 
 	for i, v in pairs(hookedFunctions) do
