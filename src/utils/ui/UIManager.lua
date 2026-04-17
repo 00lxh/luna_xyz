@@ -190,16 +190,6 @@ function UICreator:CreateWindow()
 
 	Logger.success("Home tab created.");
 
-	----- || FUNCITONS CHECK || -----
-
-	luna_xyz_env.CheckToggle = function(toggleName: string, value: boolean)
-		return luna_xyz_env.Toggles[toggleName] and luna_xyz_env.Toggles[toggleName].Value == value;
-	end;
-
-	luna_xyz_env.CheckOption = function(optionName: string, value: any)
-		return luna_xyz_env.Options[optionName] and (typeof(luna_xyz_env.Options[optionName].Value) == "table" and luna_xyz_env.Options[optionName].Value[value] or luna_xyz_env.Options[optionName].Value == value);
-	end;
-
 	----- || UNLOAD HANDLER || -----
 
 	luna_xyz_env.Library:OnUnload(function()
