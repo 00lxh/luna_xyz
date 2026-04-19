@@ -20,7 +20,7 @@ type RichPresenceImage = {
 
 function BloxstrapRPC.SendMessage(command: string, data: any)
 	
-	local json = shared.HttpService:JSONEncode({
+	local json = luna_xyz_env:GetService("HttpService"):JSONEncode({
 		command = command; data = data;
 	});
 
