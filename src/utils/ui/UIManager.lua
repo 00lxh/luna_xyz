@@ -271,12 +271,12 @@ function UICreator:CreateSettingsTab()
 
 	MenuGroup:AddDivider();
 
-	MenuGroup:AddToggle("DiscordRichPresence", {
-		Text = "Discord Rich Presence"; Default = false;
-	});
-
 	MenuGroup:AddToggle("ExecuteOnTeleport", {
 		Text = "Execute on Teleport"; Default = false;
+	});
+	
+	MenuGroup:AddToggle("DiscordRichPresence", {
+		Text = "Discord Rich Presence"; Default = true;
 	});
 	
 	MenuGroup:AddToggle("CreateLogs", {
