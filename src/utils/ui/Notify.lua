@@ -7,7 +7,11 @@ local Notifications = {
 local customNotifications = {};
 local CacheFoler = luna_xyz_env:GetService("Cache");
 
-function Notifications:Notify(options)
+function Notifications:Notify(options, _time)
+	
+	if typeof(options) ~= "table" then
+		options = { Description = tostring(options); Time = _time or 5; };
+	end;
 	
 	assert(options, "Argument #1 missing or nil");
 	assert(typeof(options) == "table", 'Invalid argument #1 to "Notify" (table expected, got ' .. typeof(options) .. ')');
@@ -115,4 +119,5 @@ function Notifications:ToggleSound(value: boolean)
 	Notifications.NotifySound = luna_xyz_env:ParseBoolean(value);
 end;
 
+luna_xyz_env.Notify = Notifications.Notify;
 return Notifications;
