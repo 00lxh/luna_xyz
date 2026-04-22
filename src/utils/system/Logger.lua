@@ -81,7 +81,7 @@ local __s, __d = pcall(function()
 end);
 
 if not current_logs then getgenv().current_logs = {}; end;
-if logger_conn then logger_conn:Disconnect(); logger_conn = nil; end;
+if Logger.logger_conn then Logger.logger_conn:Disconnect(); Logger.logger_conn = nil; end;
 
 ----- || METHODS || -----
 
@@ -322,29 +322,29 @@ end;
 
 function Logger:ToggleIcons(value: boolean)
 
-	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleIcons" (string expected, got ' .. typeof(value) .. ')');
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleIcons" (boolean expected, got ' .. typeof(value) .. ')');
 	Logger.IconsEnabled = value;
 end;
 
 function Logger:ToggleLogs(value: boolean)
 
-	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleLogs" (string expected, got ' .. typeof(value) .. ')');
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleLogs" (boolean expected, got ' .. typeof(value) .. ')');
 	Logger.SaveLogs = value;
 end;
 
 function Logger:ToggleConsoleLogs(value: boolean)
 
-	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleConsoleLogs" (string expected, got ' .. typeof(value) .. ')');
+	assert(typeof(value) == "boolean", 'Invalid argument #1 to "ToggleConsoleLogs" (boolean expected, got ' .. typeof(value) .. ')');
 	Logger.ConsoleLogs = value;
 end;
 
 function Logger:Destroy()
 	
-	if logger_conn then logger_conn:Disconnect(); getgenv().logger_conn = nil; end;
+	if Logger.logger_conn then Logger.logger_conn:Disconnect(); Logger.logger_conn = nil; end;
 	getgenv().Logger = nil;
 end;
 
-getgenv().logger_conn = RunService.Heartbeat:Connect(function()
+Logger.logger_conn = RunService.Heartbeat:Connect(function()
 
 	if not CoreGui:FindFirstChild("DevConsoleMaster") then return; end;
 	local DevConsoleUI = CoreGui.DevConsoleMaster.DevConsoleWindow.DevConsoleUI;
