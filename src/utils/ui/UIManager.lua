@@ -1,6 +1,9 @@
 local UICreator = {};
 
-local Inviter = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua"))();
+local HttpService = luna_xyz_env:GetService("HttpService");
+local Players = luna_xyz_env:GetService("Players");
+
+local Inviter = luna_xyz_env:GetService("DiscordInvites");
 
 luna_xyz_env.Library = luna_xyz_env:GetService("Library");
 local Notifications = luna_xyz_env:GetService("Notify");
@@ -10,9 +13,6 @@ local SaveManager = luna_xyz_env:GetService("SaveManager");
 
 luna_xyz_env.Toggles = getgenv().Library.Toggles;
 luna_xyz_env.Options = getgenv().Library.Options;
-
-local HttpService = luna_xyz_env:GetService("HttpService");
-local Players = luna_xyz_env:GetService("Players");
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
@@ -126,12 +126,12 @@ function UICreator:CreateWindow()
 
 		if not setclipboard then
 
-			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	AccountGroup:AddButton({
@@ -142,12 +142,12 @@ function UICreator:CreateWindow()
 			
 			if not setclipboard then
 
-				Notifications:Notify({ Description = "Scriptblox link: https://scriptblox.com/u/00_lxh"; Time = 10; });
+				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 				return;
 			end;
 
 			setclipboard(luna_xyz_env.discord_id);
-			Notifications:Notify({ Description = "Copied Scriptblox link to clipboard!"; });
+			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
@@ -282,7 +282,7 @@ function UICreator:CreateSettingsTab()
 	MenuGroup:AddToggle("CreateLogs", {
 
 		Text = "Create Logs";
-		Default = (not isfile("luna_xyz/saves/save_logs.txt")) or (readfile("luna_xyz/saves/save_logs.txt") == "true");
+		Default = (isfile and readfile and isfile("luna_xyz/saves/save_logs.txt") and readfile("luna_xyz/saves/save_logs.txt") == "true");
 
 		Callback = function(value)
 			writefile("luna_xyz/saves/save_logs.txt", tostring(value));
@@ -300,12 +300,12 @@ function UICreator:CreateSettingsTab()
 		
 		if not setclipboard then
 
-			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	MenuGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
@@ -397,7 +397,7 @@ function UICreator:CreateSettingsTab()
 	end);
 
 	NotificationsTab:AddButton("Test Notification", function()
-		Notifications:Notify({ Description = "This is a test notification. You can change the sound settings above."; });
+		Notifications:Notify("This is a test notification. You can change the sound settings above.");
 	end);
 
 	Logger.success("Settings tab created.");
@@ -494,12 +494,12 @@ function UICreator:CreateCreditsTab()
 
 		if not setclipboard then
 
-			Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 			return;
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
-		Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+		Notifications:Notify("Copied discord link to clipboard!");
 	end);
 
 	CommunitySection:AddButton({
@@ -510,12 +510,12 @@ function UICreator:CreateCreditsTab()
 
 			if not setclipboard then
 
-				Notifications:Notify({ Description = 'Discord link: ' .. luna_xyz_env.discord_id; Time = 10; });
+				Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
 				return;
 			end;
 
 			setclipboard(luna_xyz_env.discord_id);
-			Notifications:Notify({ Description = "Copied discord link to clipboard!"; });
+			Notifications:Notify("Copied discord link to clipboard!");
 		end;
 	});
 
