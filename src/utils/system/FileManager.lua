@@ -98,7 +98,9 @@ local modules_list = {
 	{ name = "system", data = {
 		
 		{ name = "Environment", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/Environment.lua" },
-		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },	
+		
+		{ name = "BloxstrapRPC", url = "https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/src/utils/system/BloxstrapRPC.lua" },
+		{ name = "DiscordInvites", url = "https://raw.githubusercontent.com/RegularVynixu/Utilities/main/Discord%20Inviter/Source.lua" },
 	}},
 	
 	{ name = "ui", data = {
