@@ -58,7 +58,7 @@ end;
 function luna_xyz_env:GetServices(serviceNames: table)
 
 	assert(serviceNames, "Argument #1 missing or nil");
-	assert(typeof(serviceNames) == "table", 'Invalid argument #1 to "GetServices" (string expected, got ' .. typeof(serviceNames) .. ')');
+	assert(typeof(serviceNames) == "table", 'Invalid argument #1 to "GetServices" (table expected, got ' .. typeof(serviceNames) .. ')');
 
 	for _, serviceName: string in ipairs(serviceNames) do
 		luna_xyz_env:GetService(serviceName);
