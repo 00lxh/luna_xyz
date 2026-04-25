@@ -73,7 +73,7 @@ local function GetGreeting()
 	return "Good evening";
 end;
 
-function UICreator:CreateWindow()
+function UICreator:CreateMainWindow()
 
 	Logger.debug("Loading main window..");
 
@@ -85,8 +85,8 @@ function UICreator:CreateWindow()
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
 
-		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
-		AutoShow = false; NotifySide = "Right"; MenuFadeTime = 0; TabPadding = 2;
+		Center = true; AutoShow = false; Resizable = true; ShowCustomCursor = true;
+		NotifySide = "Right";-- MenuFadeTime = 0; TabPadding = 2;
 	});
 
 	luna_xyz_env.Library.ForceCheckbox = true; 
@@ -204,6 +204,87 @@ function UICreator:CreateWindow()
 		getgenv().luna_xyz_loading = nil; getgenv().luna_xyz_loaded = nil;
 	end);
 
+	return Window;
+end;
+
+function UICreator:CreateKeyWindow(__callback)
+
+	Logger.debug("Loading key window..");
+
+	local Window = luna_xyz_env.Library:CreateWindow({
+
+		Title = "luna.xyz";
+		Footer = 'Game: ' .. luna_xyz_env.ScriptName .. ' | Game Build: ' .. tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]) .. ' | Loader Build: ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. ' | Made by 00._lxh';
+
+		IconSize = UDim2.fromOffset(20, 20);
+		Icon = "rbxassetid://5012126105";
+
+		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
+		NotifySide = "Right"; Size = UDim2.fromOffset(625, 360);-- MenuFadeTime = 0; TabPadding = 2;
+	});
+	
+	Logger.success("Key window loaded.");
+	
+	----- || KEY || -----
+	
+	Logger.debug("Creating key tab..");
+	local KeyTab = Window:AddKeyTab("Key", "key-round");
+	
+	KeyTab:AddLabel('<b><font size="25">luna.xyz Beta Access</font></b>', true);
+	KeyTab:AddLabel("Your key grants you exclusive access to the beta version. Thank you for supporting the development of luna.xyz!", true);
+
+	KeyTab:AddKeyBox(__callback);
+	
+	KeyTab:AddLabel('Are you lost? Go to <b><font color="rgb(172, 215, 230)">Info</font></b> tab', true);
+	Logger.success("Key tab created.");
+
+	----- || INFO || -----
+	
+	Logger.debug("Creating info tab..");
+	local InfoTab = Window:AddTab("Info", "info");
+	
+	local KeyGroup = InfoTab:AddLeftGroupbox("Key", "info");
+	local HelpGroup = InfoTab:AddRightGroupbox("Help", "info");
+	
+	KeyGroup:AddLabel('Gain access by joining our Discord server and obtaining the <b><font color="rgb(72, 230, 132)">BETA TESTER</font></b> role. This ensures access to the private beta.', true);
+	HelpGroup:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
+	
+	HelpGroup:AddButton("Join Discord", function()
+
+		Inviter.Join(luna_xyz_env.discord_id);
+		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
+
+	end):AddButton("Copy Link", function()
+
+		if not setclipboard then
+
+			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			return;
+		end;
+
+		setclipboard(luna_xyz_env.discord_id);
+		Notifications:Notify("Copied discord link to clipboard!");
+	end);
+	
+	HelpGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
+	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
+	
+	Logger.success("Info tab created.");
+
+	----- || UNLOAD HANDLER || -----
+
+	luna_xyz_env.Library:OnUnload(function()
+
+		if luna_xyz_env:GetService("Cache") then luna_xyz_env:GetService("Cache"):Destroy(); end;
+		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:DoCleaning();
+
+		luna_xyz_env.Library.Unloaded = true;
+		mstudio45_ESP:Destroy();
+
+		getgenv().luna_xyz_env = nil; getgenv().luna_xyz_addons = nil;
+		getgenv().luna_xyz_loading = nil; getgenv().luna_xyz_loaded = nil;
+	end);
+	
 	return Window;
 end;
 
