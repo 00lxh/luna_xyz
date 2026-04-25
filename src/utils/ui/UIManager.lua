@@ -521,7 +521,7 @@ function UICreator:CreateSettingsTab()
 		if not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or getgenv().queued_to_teleport then return; end;
 		getgenv().queued_to_teleport = true;
 
-		--queue_on_teleport([[ loadstring(game:HttpGet("https://github.com/notpoiu/mspaint/releases/latest/download/Script.luau"))() ]]);
+		queue_on_teleport([[ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/fac6b129defbda2cf7d7a4cfaf9a7ae28589934ccb46cb06858577fd2c34e64b/download"))(); ]]);
 	end));
 
 	Logger.success("All settings loaded.");
