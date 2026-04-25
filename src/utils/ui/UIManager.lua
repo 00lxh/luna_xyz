@@ -478,7 +478,7 @@ function UICreator:CreateSettingsTab()
 	end);
 
 	NotificationsTab:AddButton("Test Notification", function()
-		Notifications:Notify("This is a test notification. You can change the sound settings above.");
+		Notifications:Notify("This is a test notification. You can change the notification settings above.");
 	end);
 
 	Logger.success("Settings tab created.");
