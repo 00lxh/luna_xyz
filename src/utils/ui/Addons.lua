@@ -132,7 +132,7 @@ function addons:LoadAddons()
 		return {};
 	end;
 
-	repeat task.wait() until luna_xyz_loaded;
+	repeat task.wait() until getgenv().luna_xyz_loaded;
 
 	local startTime = os.time();
 	Logger.debug("Loading addons..");
