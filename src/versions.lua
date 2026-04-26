@@ -1,6 +1,6 @@
 local versions = {
 
-	["luna_xyz_loader"] = "v7.2.5";
+	["luna_xyz_loader"] = "v7.2.6";
 	
 	["the_rakoof"] = "v3.2.1";
 	["rake_remastered"] = "v2.2.1";
