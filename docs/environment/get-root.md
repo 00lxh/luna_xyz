@@ -2,43 +2,43 @@
 
 Returns the primary movement part of a player's character. Searches in priority order and returns the first part found.
 
-## Signature
+### Syntax
 
 ```lua
-luna_xyz_env:GetRoot(player: Player) → BasePart?
+luna_xyz_env:GetRoot(player: Player) -> BasePart?
 ```
 
-## Parameters
+### Parameters
 
-| Parameter | Type | Description |
-|---|---|---|
-| `player` | `Player` | The target `Player` instance. |
+| Parameter | Type     | Description                   |
+| --------- | -------- | ----------------------------- |
+| `player`  | `Player` | The target `Player` instance. |
 
-## Priority Order
+### Priority Order
 
-| Priority | Part | Rig |
-|---|---|---|
-| 1st | `HumanoidRootPart` | R6 and R15 (standard) |
-| 2nd | `UpperTorso` | R15 fallback |
-| 3rd | `Torso` | R6 fallback |
+| Priority | Part               | Rig                   |
+| -------- | ------------------ | --------------------- |
+| 1st      | `HumanoidRootPart` | R6 and R15 (standard) |
+| 2nd      | `UpperTorso`       | R15 fallback          |
+| 3rd      | `Torso`            | R6 fallback           |
 
 {% hint style="info" %}
 Returns `nil` if none of the three parts are found (e.g. custom rigs). Always nil-check the result.
 {% endhint %}
 
-## Examples
+### Example
 
 ```lua
-local root = luna_xyz_env:GetRoot(game.Players.LocalPlayer)
+local root = luna_xyz_env:GetRoot(game.Players.LocalPlayer);
 
 if root then
-    print("Position:", root.Position)
-    print("CFrame:", root.CFrame)
-end
+    print("Position:", root.Position);
+    print("CFrame:", root.CFrame);
+end;
 
 -- Teleport example
-local root = luna_xyz_env:GetRoot(player)
+local root = luna_xyz_env:GetRoot(player);
 if root then
-    root.CFrame = CFrame.new(0, 50, 0)
-end
+    root.CFrame = CFrame.new(0, 50, 0);
+end;
 ```
