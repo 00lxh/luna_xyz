@@ -7,7 +7,7 @@ local HttpService = cloneref(game:GetService("HttpService"));
 local Players = cloneref(game:GetService("Players"));
 
 if not luna_xyz_env._SupportsFileSystem then
-	Logger.warn('The executor ' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. ' doesnt support file system, some features will be disabled.');
+	Logger.warn(('The executor %s - %s doesnt support file system, some features will be disabled.'):format(identifyexecutor(), select(2, identifyexecutor())));
 end;
 
 local isfile = isfile or function(path)
@@ -187,17 +187,17 @@ end;
 
 function FileManager:LoadModule(module_path: string, module_data: string)
 	
-	local startTime = os.time();
-	Logger.debug('Checking module: ' .. module_path .. '.lua');
+	local startTime = os.clock();
+	Logger.debug(('Checking module: %s.lua'):format(module_path));
 
-	local local_file = 'luna_xyz/utils/'.. module_path .. '.lua';
+	local local_file = ('luna_xyz/utils/%s.lua'):format(module_path);
 	local cache  = hash_cache[module_path];
 
 	local __s, __d = pcall(game.HttpGet, game, module_data);
 
 	if not __s then
 
-		Logger.error('Failed to fetch module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+		Logger.error(('Failed to fetch module %s.lua - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
@@ -208,13 +208,13 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 
 	if needsUpdate then
 
-		local startTime2 = os.time();
+		local startTime2 = os.clock();
 
-		hash_cache[module_path] = { hash = remoteHash; url = module_data; time = os.time(); };
+		hash_cache[module_path] = { hash = remoteHash; url = module_data; time = os.clock(); };
 		writefile("luna_xyz/hash_cache.json", HttpService:JSONEncode(hash_cache));
 
 		writefile(local_file, __d);
-		Logger.info('Module ' .. module_path ..  '.lua updated. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+		Logger.info(('Module %s.lua updated. - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
 	end;
 
 	local __s, __d = pcall(function()
@@ -223,59 +223,59 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 
 	if not __s then
 
-		Logger.error('Failed to load module ' .. module_path .. '.lua - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+		Logger.error(('Failed to load module %s.lua - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
 	end;
-
+	
 	luna_xyz_env.loaded_libs[module_path:match(".+/(.+)") or module_path] = __d;
-	Logger.success('The module ' .. module_path .. '.lua loaded successfully. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	Logger.success(('The module %s.lua loaded successfully. - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
 end;
 
 ----- || FILE CHECK || -----
 
-local startTime = os.time();
+local startTime = os.clock();
 Logger.debug("Checking files integrity..");
 
 for folder_name, folder_data in pairs(luna_files) do
 
 	if #folder_data == 0 then
 
-		if isfolder('luna_xyz/' .. tostring(folder_name)) then continue; end;
-		makefolder('luna_xyz/' .. tostring(folder_name));
+		if isfolder(('luna_xyz/%s'):format(tostring(folder_name))) then continue; end;
+		makefolder(('luna_xyz/%s'):format(tostring(folder_name)));
 		
-		Logger.debug('The folder "luna_xyz/' .. tostring(folder_name) .. '" was not found, Creaitng a new one..');
+		Logger.debug(('The folder "luna_xyz/%s" was not found, Creaitng a new one..'):format(tostring(folder_name)));
 	end;
 
 	for file_name, file_data in pairs(folder_data) do
 
-		if file_data._t == "folder" and not isfolder('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name)) then
+		if file_data._t == "folder" and not isfolder(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name))) then
 
-			makefolder('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name));
-			Logger.debug('The folder "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '" was not found, Creaitng a new one..');
+			makefolder(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name)));
+			Logger.debug('The folder "luna_xyz/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name));
 
 			for a, b in pairs(file_data.content) do
 
-				writefile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a), tostring(b));
-				if isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a)) then continue; end;
+				writefile(('luna_xyz/%s/%s/%s'):format(tostring(folder_name), tostring(file_name), tostring(a)), tostring(b));
+				if isfile(('luna_xyz/%s/%s/%s'):format(tostring(folder_name), tostring(file_name), tostring(a))) then continue; end;
 				
-				Logger.debug('The file "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '/' .. tostring(a) .. '" was not found, Creaitng a new one..');
+				Logger.debug('The file "luna_xyz/%s/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name), tostring(a));
 			end;
 
-		elseif file_data._t == "file" and not isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name)) then
+		elseif file_data._t == "file" and not isfile(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name))) then
 
-			writefile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name), tostring(file_data.content));
-			if isfile('luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name), tostring(file_data.content)) then continue; end;
+			writefile(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name)), tostring(file_data.content));
+			if isfile(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name))) then continue; end;
 			
-			Logger.debug('The file "luna_xyz/' .. tostring(folder_name) .. '/' .. tostring(file_name) .. '" was not found, Creaitng a new one..');
+			Logger.debug(('The file "luna_xyz/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name)));
 		end;
 	end;
 end;
 
 for _, file_path in pairs(listfiles("luna_xyz/logs")) do
 
-	local startTime2 = os.time();
+	local startTime2 = os.clock();
 
 	local filename = tostring(file_path):match("([^\\]+)$");
 	filename = filename:match("(.+)%..+$");
@@ -283,37 +283,37 @@ for _, file_path in pairs(listfiles("luna_xyz/logs")) do
 	local months, days, years = filename:match("(%d+)%-(%d+)%-(%d+)");
 	if not(months or days or years) then continue; end;
 
-	local fileTime = os.time({ year = years, month = months, day = days });
-	local difference = os.difftime(os.time(), fileTime);
+	local fileTime = os.clock({ year = years, month = months, day = days });
+	local difference = os.difftime(os.clock(), fileTime);
 
 	local delete_days = 10;
 	if not (difference >= (delete_days * 24 * 60 * 60)) then continue; end;
 
-	Logger.warn('Deleting log file "' .. tostring(file_path):gsub("\\", "/") .. '" because is 10 days old. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	Logger.warn(('Deleting log file "%s" because is 10 days old. - (%s)'):format(tostring(file_path):gsub("\\", "/"), string.format("%.2f", os.clock() - startTime2)));
 	delfile(file_path);
 end;
 
---[[if not isfile("luna_xyz/whaaaattt.mp3") and (crypt and crypt.base64decode) then
+if not isfile("luna_xyz/whaaaattt.mp3") and (crypt and crypt.base64decode) then
 	writefile("luna_xyz/whaaaattt.mp3", crypt.base64decode(game:HttpGet("https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/assets/whaaaattt.txt")));
-end;]]--
+end;
 
 if isfolder("luna_xyz/modules") then delfolder("luna_xyz/modules"); end;
-Logger.success('Files integrity good. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+Logger.success(('Files integrity good. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
 
 ----- || CACHE CHECK || -----
 
-local startTime2 = os.time();
+local startTime2 = os.clock();
 Logger.debug("Fetching cache data..");
 
 if isfile("luna_xyz/hash_cache.json") then
 	hash_cache = HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
 end;
 
-Logger.success('Loaded cache data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+Logger.success(('Loaded cache data. - (%s)'):format(string.format("%.2f", os.clock() - startTime2)));
 
 ----- || ANALITYCS CHECK || -----
 
-startTime2 = os.time();
+startTime2 = os.clock();
 Logger.debug("Fetching analytics data..");
 
 if not isfile("luna_xyz/analytics/stats.json") then
@@ -327,11 +327,11 @@ analytics_data.TotalExecutions += 1;
 luna_xyz_env.analytics_data = analytics_data;
 
 writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data));
-Logger.success('Loaded analytics data. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+Logger.success(('Loaded analytics data. - (%s)'):format(string.format("%.2f", os.clock() - startTime2)));
 
 ----- || MODULES CHECK || -----
 
-startTime = os.time();
+startTime = os.clock();
 Logger.debug("Fetching luna.xyz modules..");
 
 for _, module in ipairs(modules_list) do
@@ -343,11 +343,11 @@ for _, module in ipairs(modules_list) do
 	end;
 	
 	for _, sub in ipairs(module.data) do
-		FileManager:LoadModule(module.name .. '/' .. sub.name, sub.url)
+		FileManager:LoadModule(('%s/%s'):format(module.name, sub.name), sub.url)
 	end;
 end;
 
-Logger.success('Loaded luna.xyz modules. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+Logger.success(('Loaded luna.xyz modules. - (%s)'):format(string.format("%.2f", os.clock() - startTime)))	;
 FileManager.FilesLoaded = true;
 
 return FileManager;
