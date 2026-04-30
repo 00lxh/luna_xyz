@@ -14,7 +14,7 @@ function Notifications:Notify(options, _time)
 	end;
 	
 	assert(options, "Argument #1 missing or nil");
-	assert(typeof(options) == "table", 'Invalid argument #1 to "Notify" (table expected, got ' .. typeof(options) .. ')');
+	assert(typeof(options) == "table", ('Invalid argument #1 to "Notify" (table expected, got %s)'):format(typeof(options)));
 	
 	local customNotification = customNotifications[Notifications.NotifyType];
 
@@ -36,7 +36,7 @@ function Notifications:Notify(options, _time)
 	return luna_xyz_env.Library:Notify({
 
 		Icon = "rbxassetid://5012126105"; Time = options.Time or 5;
-		Title = '<b><font size="20">luna.xyz - ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. '</font></b>'; Description = tostring(options.Description);
+		Title = ('<b><font size="20">luna.xyz - %s</font></b>'):format(luna_xyz_env.versions["luna_xyz_loader"]); Description = tostring(options.Description);
 	});
 end;
 
@@ -45,17 +45,17 @@ function Notifications:GetCustomNotifications()
 	customNotifications = {};
 	if not luna_xyz_env._SupportsFileSystem or #listfiles("luna_xyz/assets") <= 0 then return customNotifications; end;
 	
-	local startTime = os.time();
+	local startTime = os.clock();
 	Logger.debug("Loading custom notifications..");
 	
 	for i, v in pairs(listfiles("luna_xyz/assets")) do
 
-		local startTime2 = os.time(); local notification_name = v:match(".+\\(.+)") or v;
+		local startTime2 = os.clock(); local notification_name = v:match(".+\\(.+)") or v;
 		Logger.debug('Loading custom notification ' .. notification_name .. '..');
 
 		if not ({lua=true, luau=true, txt=true})[(v:match("%.([%w]+)$") or ""):lower()] then
 
-			Logger.error('Failed to load custom notification ' .. notification_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error(('Failed to load custom notification %s - (%s)'):format(notification_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"');
 
 			continue;
@@ -67,7 +67,7 @@ function Notifications:GetCustomNotifications()
 
 		if not __s then
 
-			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error(('Failed to load custom notification %s.lua - (%s)'):format(notification_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 			continue;
@@ -75,7 +75,7 @@ function Notifications:GetCustomNotifications()
 		
 		if not __d.Name then
 
-			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error(('Failed to load custom notification %s.lua - (%s)'):format(notification_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(__d.Name) .. ')');
 
 			continue;
@@ -83,17 +83,17 @@ function Notifications:GetCustomNotifications()
 		
 		if not __d.Notify then
 
-			Logger.error('Failed to load custom notification ' .. notification_name .. '.lua - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error(('Failed to load custom notification %s.lua - (%s)'):format(notification_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: Invalid Notify function (function expected, got ' .. typeof(__d.Notify) .. ')');
 
 			continue;
 		end;
 
 		customNotifications[__d.Name] = __d;
-		Logger.success('Custom notification ' .. notification_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+		Logger.success(('Custom notification %s loaded successfully. - (%s)'):format(notification_name, string.format("%.2f", os.clock() - startTime2)));
 	end;
 	
-	Logger.success('Loaded luna.xyz custom notifications. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+	Logger.success(('Loaded luna.xyz custom notifications. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
 	return customNotifications;
 end;
 
