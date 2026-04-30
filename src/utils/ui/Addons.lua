@@ -1,227 +1,233 @@
-local addons = {};
-local lastPosition = 1;
+local addons, LayoutManager = {}, {};
+LayoutManager.__index = LayoutManager;
 
-local function CreateGroupboxProxy(AddonGroupbox)
-
-	local actions = {};
-
-	local function createFake()
-		
-		local fake = {};
-
-		setmetatable(fake, {
-			
-			__index = function(self, method)
-				return function(_, ...)
-
-					local newFake = createFake();
-					table.insert(actions, { type = "ObjectMethod"; object = self; method = method; args = {...}; returnObj = newFake; })
-
-					return newFake;
-				end;
-			end;
-		});
-
-		return fake;
-	end;
-	
-	local proxy = setmetatable({}, {
-		
-		__index = function(_, method)
-			return function(_, ...)
-
-				local fakeObject = createFake();
-
-				table.insert(actions, { type = "GroupboxMethod"; method = method; args = {...}; returnObj = fakeObject; });
-				return fakeObject;
-			end;
-		end;
-	});
-	
-	local function CommitUI()
-		for _, action in ipairs(actions) do
-
-			if action.type == "GroupboxMethod" then
-
-				local real = AddonGroupbox[action.method](AddonGroupbox, unpack(action.args));
-				if action.returnObj and type(real) == "table" then action.returnObj.__real = real; end;
-
-			elseif action.type == "ObjectMethod" then
-
-				local fake = action.object; local real = fake.__real;
-
-				if real and real[action.method] then
-					
-					local result = real[action.method](real, unpack(action.args));
-					if action.returnObj and type(result) == "table" then action.returnObj.__real = result; end;
-				end;
-			end;
-		end;
-	end;
-
-	local function ClearUI() table.clear(actions); end;
-	return proxy, CommitUI, ClearUI;
+function LayoutManager.new(tab)
+	return setmetatable({ tab = tab, side = 1 }, LayoutManager);
 end;
 
-local function CreateAddonGroupbox(AddonsTab, title, icon)
-
-	local Groupbox = lastPosition == 1 and AddonsTab:AddLeftGroupbox(title, icon or "") or AddonsTab:AddRightGroupbox(title, icon or "");
-	if lastPosition == 1 then lastPosition = 2; else lastPosition = 1; end;
-
+function LayoutManager:AddGroupbox(title, icon)
+	
+	local Groupbox;
+	
+	if self.side == 1 then Groupbox = self.tab:AddLeftGroupbox(title, icon or ""); else Groupbox = self.tab:AddRightGroupbox(title, icon or ""); end;
+	self.side = self.side == 1 and 2 or 1;
+	
 	return Groupbox;
 end;
 
-local function CreateAddonEnv(AddonsTab, addon_name)
-
-	local exec_env, real_env, addon_env = getrenv(), {}, {};
+local function createDeferredProxy()
 	
-	setmetatable(addon_env, {
+	local queue = {};
+	local sealed = false;
 
-		__newindex = function(_, key, value)
-
-			if key ~= "AddonInfo" then
-
-				rawset(real_env, key, value); rawset(addon_env, key, value);
-				return;
+	local makeProxy = function(q)
+		
+		return setmetatable({}, {
+			
+			__index = function(_, method)
+				
+				if sealed then error("Groupbox cannot be used after CommitUI()", 2); end;
+				return function(_, ...)
+					
+					local args  = { ... };
+					local children = {};
+					
+					table.insert(q, { method = method, args = args, children = children });
+					
+					return setmetatable({}, {
+						
+						__index = function(self2, m2)
+							return function(_, ...) table.insert(children, { method = m2, args = { ... }, children = {} }); end;
+						end;
+					});
+				end;
 			end;
-
-			rawset(real_env, key, value); rawset(addon_env, key, value);
-
-			local realGroupbox = CreateAddonGroupbox(AddonsTab, value.Title .. ' - ' .. addon_name, value.Icon or "")
-			local proxy, CommitUI, ClearUI = CreateGroupboxProxy(realGroupbox);
-
-			rawset(real_env, "Groupbox", proxy); rawset(addon_env, "Groupbox", proxy);
-			rawset(addon_env, "CurrentGroupbox", realGroupbox); rawset(addon_env, "CommitUI", CommitUI); rawset(addon_env, "ClearUI", ClearUI);
+		});
+	end;
+	
+	local function replay(realObj, q)
+		
+		for _, entry in ipairs(q) do
+			
+			local fn = realObj[entry.method];
+			if type(fn) ~= "function" then continue; end;
+			
+			local result = fn(realObj, table.unpack(entry.args));
+			if type(result) == "table" and #entry.children > 0 then replay(result, entry.children); end;
 		end;
+	end;
+
+	local proxy = makeProxy(queue);
+
+	local function commit(realGroupbox)
+		sealed = true; replay(realGroupbox, queue); queue = nil;
+	end;
+
+	local function discard()
+		sealed = true queue  = nil;
+	end;
+
+	return proxy, commit, discard;
+end;
+
+local function createAddonEnv(layout, addonName)
+
+	local env = {};
+	local committed = false;
+
+	local gbProxy, commitProxy, discardProxy = createDeferredProxy();
+
+	local function validateAddonInfo(info)
+		
+		if type(info) ~= "table" then return false, ('Invalid AddonInfo table (table expected, got %s)'):format(typeof(info)); end;
+		if type(info.Title) ~= "string" or info.Title == "" then return false, ('Invalid title argument (string expected, got %s)'):format(typeof(info.Title)); end;
+		
+		if not luna_xyz_env:IsValidGame(info.Game) then return false, ('Unsupported game (%s) by luna.xyz'):format(tostring(info.Game)); end;
+		return true;
+	end;
+
+	setmetatable(env, {
+		
+		__newindex = function(_, key, value)
+			
+			rawset(env, key, value);
+
+			if key == "AddonInfo" then
+				
+				local ok, err = validateAddonInfo(value);
+				if not ok then discardProxy(); error(err, 2); end;
+
+				local title = ("%s — %s"):format(value.Title, addonName);
+				local gb    = layout:AddGroupbox(title, value.Icon or "");
+
+				rawset(env, "_realGroupbox", gb); rawset(env, "Groupbox", gb);
+				commitProxy(gb); committed = true;
+			end;
+		end,
 
 		__index = function(_, key)
-			return rawget(addon_env, key) or AddonsTab[key] or luna_xyz_env[key] or exec_env[key];
-		end;
+			return rawget(env, key) or luna_xyz_env[key] or getrenv()[key];
+		end,
 	});
+	
+	env.luna_xyz = env;
+	env.luna_xyz_env = luna_xyz_env;
 
-	addon_env.luna_xyz = addon_env;
-	addon_env.luna_xyz_env = luna_xyz_env;
+	function env:_discard()
+		if not committed then discardProxy(); end;
+	end;
 
-	return addon_env;
+	function env:_isCommitted()
+		return committed;
+	end;
+
+	return env;
+end;
+
+local function showError(layout, groupbox, message)
+	
+	local Groupbox = groupbox or layout:AddGroupbox("⚠ Error");
+	Groupbox:AddLabel(('<font color="rgb(255, 0, 0)">RUNTIME ERROR: %s</font>'):format(message), true);
 end;
 
 function addons:LoadAddons()
-	
+
 	local AddonsTab = luna_xyz_env.Window:AddTab("Addons", "boxes");
-	local lastPosition = 1;
+	local layout = LayoutManager.new(AddonsTab);
 
 	if not luna_xyz_env._SupportsFileSystem then
-
+		
 		AddonsTab:UpdateWarningBox({
 
 			Title = '<font size="20">luna.xyz - FileSystem API ERROR</font>', Visible = true;
 			Text = "\nluna.xyz was unable to create addons folder (<b>ERROR: FileSystem API</b>)\n<i>If the error persists, please contact the development team.</i>";
-		});
-
-		return {};
+		});		
+		return;
 	end;
 
-	if #listfiles("luna_xyz/addons") <= 0 then
+	local files = listfiles("luna_xyz/addons");
 
+	if #files == 0 then
+		
 		AddonsTab:UpdateWarningBox({
 
 			Title = '<font size="20">luna.xyz - FileSystem API ERROR</font>', Visible = true;
 			Text = "\nYour addons FOLDER is empty! (luna_xyz/addons)."
 		});
-
-		return {};
+		return;
 	end;
-
+	
 	repeat task.wait() until getgenv().luna_xyz_loaded;
-
-	local startTime = os.time();
-	Logger.debug("Loading addons..");
 
 	AddonsTab:UpdateWarningBox({
 
 		Title = '<font size="20">luna.xyz - WARNING</font>', Visible = true;
 		Text = "\nThis tab is for UN-OFFICIAL addons made for luna.xyz, We are not responsible for what addons you will use. You are putting yourself <b>AT RISK</b> since you are executing third-party scripts.";
 	});
-	
-	for i, v in pairs(listfiles("luna_xyz/addons")) do
-		
-		local startTime2 = os.time(); local addon_name = v:match(".+\\(.+)") or v;
+
+	local startTime = os.clock();
+	Logger.debug("Loading addons..");
+
+	for _, path in ipairs(files) do
+
+		local addon_name, ext = path:match("[/\\]([^/\\]+)$") or path, (path:match("%.(%w+)$") or ""):lower();
+		local startTime2  = os.clock();
+
 		Logger.debug('Loading addon ' .. addon_name .. '..');
-		
-		if not ({lua=true, luau=true, txt=true})[(v:match("%.([%w]+)$") or ""):lower()] then
+
+		-- Extension check
+		if not ({lua=true, luau=true, txt=true})[ext] then
 			
-			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			Logger.error(('Failed to load addon %s - (%s)'):format(addon_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"');
 
-			local Groupbox = CreateAddonGroupbox(AddonsTab, addon_name);
-			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Invalid extension type must be ".lua", ".luau", ".txt"</font>', true);
-
+			showError(layout, nil, 'Invalid extension type must be ".lua", ".luau", ".txt"');
 			continue;
 		end;
 
-		local fn = loadfile and loadfile(v) or loadstring(readfile(v));
-		local addon_env = CreateAddonEnv(AddonsTab, addon_name);
+		local fn = loadfile and loadfile(path) or loadstring(readfile(path));
 		
-		setfenv(fn, addon_env);
+		if not fn then
+			
+			Logger.error(('Failed to load addon %s - (%s)'):format(addon_name, string.format("%.2f", os.clock() - startTime2)));
+			Logger.error('    RUNTIME ERROR: Cannot load addon data');
+			
+			showError(layout, nil, "Cannot load addon data");
+			continue;
+		end;
+		
+		local env = createAddonEnv(layout, addon_name);
+		setfenv(fn, env);
+
 		local success, runtimeErr = pcall(fn);
 
-		if not addon_env.AddonInfo then
-			
-			if addon_env.ClearUI then addon_env.ClearUI(); end;
-
-			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: "AddonInfo" table not found');
-
-			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
-			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: "AddonInfo" table not found</font>', true);
-
-			continue;
-		end;
-
-		if not addon_env.AddonInfo.Title then
-			
-			if addon_env.ClearUI then addon_env.ClearUI(); end;
-
-			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(addon_env.AddonInfo.Title) .. ')');
-
-			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
-			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Invalid title argument (string expected, got ' .. typeof(addon_env.AddonInfo.Title) .. ')</font>', true);
-
-			continue;
-		end;
-		
-		if not addon_env.AddonInfo.Game or not luna_xyz_env:IsValidGame(addon_env.AddonInfo.Game) then
-
-			if addon_env.ClearUI then addon_env.ClearUI(); end;
-
-			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-			Logger.error('    RUNTIME ERROR: Unsupported game (' .. tostring(addon_env.AddonInfo.Game) .. ') by luna.xyz');
-
-			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
-			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: Unsupported game (' .. tostring(addon_env.AddonInfo.Game) .. ') by luna.xyz</font>', true);
-
-			continue;
-		end;
-		
 		if not success then
 			
-			if addon_env.ClearUI then addon_env.ClearUI(); end;
-
-			Logger.error('Failed to load addon ' .. addon_name .. ' - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
+			env:_discard();
+			
+			Logger.error(('Failed to load addon %s - (%s)'):format(addon_name, string.format("%.2f", os.clock() - startTime2)));
 			Logger.error('    RUNTIME ERROR: ' .. tostring(runtimeErr));
-
-			local Groupbox = addon_env.CurrentGroupbox or CreateAddonGroupbox(AddonsTab, addon_name);
-			Groupbox:AddLabel('<font color="rgb(255, 0, 0)">RUNTIME ERROR: ' .. tostring(runtimeErr) .. '</font>', true);
-
+			
+			showError(layout, rawget(env, "_realGroupbox"), tostring(runtimeErr));
 			continue;
 		end;
 		
-		addon_env.CommitUI();
-		Logger.success('The addon ' .. addon_name .. ' loaded successfully. - (' .. string.format("%.2f", os.time() - startTime2) .. ')');
-	end;
+		if not env:_isCommitted() then
+			
+			env:_discard();
+			
+			Logger.error(('Failed to load addon %s - (%s)'):format(addon_name, string.format("%.2f", os.clock() - startTime2)));
+			Logger.error('    RUNTIME ERROR: "AddonInfo" table not found');
+			
+			showError(layout, nil, '"AddonInfo" table not found');
 	
-	Logger.success('Loaded luna.xyz addons. - (' .. string.format("%.2f", os.time() - startTime) .. ')');
+			continue;
+		end;
+
+		Logger.success(('The addon %s loaded successfully. - (%s)'):format(addon_name, string.format("%.2f", os.clock() - startTime2)));
+	end;
+
+	Logger.success(('Loaded luna.xyz addons. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
 end;
 
 return addons;
