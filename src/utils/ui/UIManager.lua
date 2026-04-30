@@ -80,7 +80,7 @@ function UICreator:CreateMainWindow()
 	local Window = luna_xyz_env.Library:CreateWindow({
 
 		Title = "luna.xyz";
-		Footer = 'Game: ' .. luna_xyz_env.ScriptName .. ' | Game Build: ' .. tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]) .. ' | Loader Build: ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. ' | Made by 00._lxh';
+		Footer = ('Game: %s | Game Build: %s | Loader Build: %s | Made by 00._lxh'):format(luna_xyz_env.ScriptName, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]), tostring(luna_xyz_env.versions["luna_xyz_loader"]));
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
@@ -100,7 +100,7 @@ function UICreator:CreateMainWindow()
 	HomeTab:UpdateWarningBox({
 
 		Title = '<font size="20">Welcome to <font color="rgb(255, 200, 76)">luna.xyz</font></font>!', Visible = true; IsNormal = true;
-		Text = '\n<b>Moon fun fact:\n</b>' .. moonFunFacts[math.random(1, #moonFunFacts)];
+		Text = ('\n<b>Moon fun fact:\n%s</b>'):format(moonFunFacts[math.random(1, #moonFunFacts)]);
 	});
 
 	local AccountGroup = HomeTab:AddLeftGroupbox("Account", "circle-user-round");
@@ -114,7 +114,7 @@ function UICreator:CreateMainWindow()
 		Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
 	});
 
-	AccountGroup:AddLabel(GetGreeting() .. ', ' .. Players.LocalPlayer.DisplayName .. ' - <b>Member</b>', true);
+	AccountGroup:AddLabel(('%s, %s - <b>Member</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName), true);
 	AccountGroup:AddDivider();
 
 	AccountGroup:AddButton("Join Discord", function()
@@ -126,7 +126,7 @@ function UICreator:CreateMainWindow()
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 			return;
 		end;
 
@@ -146,30 +146,30 @@ function UICreator:CreateMainWindow()
 				return;
 			end;
 
-			setclipboard(luna_xyz_env.discord_id);
+			setclipboard("https://scriptblox.com/u/00_lxh");
 			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
-	for i, v in pairs(luna_xyz_env.supported_games) do
+	for name, info in pairs(luna_xyz_env.supported_games) do
 
-		if v == 142823291 then continue; end;
+		if info.GameId == 142823291 then continue; end;
 
-		local placeName = i:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
+		local placeName = name:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
 			return a:upper() .. b:lower();
 		end);
 
-		local text_color = (game.PlaceId == v or game.GameId == v) and "66, 149, 245" or "255, 255, 255";
-		ScriptStatusGroup:AddLabel('[🟢] <b><font color="rgb(' .. text_color  .. ')">' .. placeName .. '</font></b>', true);
+		local text_color = (game.PlaceId == info.GameId or game.GameId == info.GameId) and "66, 149, 245" or "255, 255, 255";
+		ScriptStatusGroup:AddLabel(('[%s] <b><font color="rgb(%s)">%s</font></b>'):format(info.Status, text_color, placeName), true);
 	end;
 
 	ScriptStatusGroup:AddDivider();
 	ScriptStatusGroup:AddLabel('<b>Join our official Discord server to see a detailed log of updates and the status of the scripts!</b>', true);
 
-	AnalyticsGroup:AddLabel('Exploit: <b>' .. identifyexecutor() .. ' - ' .. select(2, identifyexecutor()) .. '</b>', true);
-	AnalyticsGroup:AddLabel('Total Executions: <b>' .. luna_xyz_env.analytics_data.TotalExecutions .. '</b>', true);
+	AnalyticsGroup:AddLabel(('Exploit: <b>%s - %s</b>'):format(identifyexecutor(), select(2, identifyexecutor())), true);
+	AnalyticsGroup:AddLabel(('Total Executions: <b>%s</b>'):format(luna_xyz_env.analytics_data.TotalExecutions), true);
 
-	AnalyticsGroup:AddLabel('Total playtime: <b>' .. luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)]) .. '</b>', true);
+	AnalyticsGroup:AddLabel(('Total playtime: <b>%s</b>'):format(luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)])), true);
 	
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
 	local startTime = os.clock();
@@ -180,7 +180,7 @@ function UICreator:CreateMainWindow()
 			local elapsed = math.floor(os.clock() - startTime);
 
 			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
-			time_elapsed:SetText('Time Elapsed: <b>' .. luna_xyz_env:FormatTime(elapsed) .. '</b>');
+			time_elapsed:SetText(('Time Elapsed: <b>%s</b>'):format(luna_xyz_env:FormatTime(elapsed)));
 
 			if (elapsed % 10) == 0 then
 				writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(luna_xyz_env.analytics_data));
@@ -214,13 +214,13 @@ function UICreator:CreateKeyWindow(__callback)
 	local Window = luna_xyz_env.Library:CreateWindow({
 
 		Title = "luna.xyz";
-		Footer = 'Game: ' .. luna_xyz_env.ScriptName .. ' | Game Build: ' .. tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]) .. ' | Loader Build: ' .. tostring(luna_xyz_env.versions["luna_xyz_loader"]) .. ' | Made by 00._lxh';
+		Footer = ('Game: %s | Game Build: %s | Loader Build: %s | Made by 00._lxh'):format(luna_xyz_env.ScriptName, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader]), tostring(luna_xyz_env.versions["luna_xyz_loader"]));
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
 
-		Center = true; AutoShow = true; Resizable = true; ShowCustomCursor = true;
-		NotifySide = "Right"; Size = UDim2.fromOffset(625, 360);-- MenuFadeTime = 0; TabPadding = 2;
+		Center = true; AutoShow = false; Resizable = true; ShowCustomCursor = true;
+		NotifySide = "Right";-- MenuFadeTime = 0; TabPadding = 2;
 	});
 	
 	Logger.success("Key window loaded.");
@@ -258,7 +258,7 @@ function UICreator:CreateKeyWindow(__callback)
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 			return;
 		end;
 
@@ -381,7 +381,7 @@ function UICreator:CreateSettingsTab()
 		
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 			return;
 		end;
 
@@ -575,7 +575,7 @@ function UICreator:CreateCreditsTab()
 
 		if not setclipboard then
 
-			Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 			return;
 		end;
 
@@ -591,12 +591,12 @@ function UICreator:CreateCreditsTab()
 
 			if not setclipboard then
 
-				Notifications:Notify('Discord link: ' .. luna_xyz_env.discord_id, 10);
+				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 				return;
 			end;
 
-			setclipboard(luna_xyz_env.discord_id);
-			Notifications:Notify("Copied discord link to clipboard!");
+			setclipboard("https://scriptblox.com/u/00_lxh");
+			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
