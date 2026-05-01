@@ -36,12 +36,6 @@
 * [GivePromise](maid/give-promise.md)
 * [DoCleaning](maid/do-cleaning.md)
 
-## Cache
-
-* [Cache](cache/get-service.md)
-
-## Notifications
-
 ## Logger
 
 * [Overview](logger/overview.md)
@@ -75,3 +69,7 @@
 * [ToggleConsoleLogs](logger/toggle-console-logs.md)
 * [ToggleIcons](logger/toggle-icons.md)
 * [Destroy](logger/destroy.md)
+
+## Cache
+
+* [Cache](cache/get-service.md)
