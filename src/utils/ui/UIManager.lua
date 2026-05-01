@@ -73,8 +73,9 @@ local function GetGreeting()
 	return "Good evening";
 end;
 
-function UICreator:CreateMainWindow()
+function UICreator:CreateMainWindow(system_data)
 
+	system_data = system_data or {};
 	Logger.debug("Loading main window..");
 
 	local Window = luna_xyz_env.Library:CreateWindow({
@@ -84,9 +85,9 @@ function UICreator:CreateMainWindow()
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
-
-		Center = true; AutoShow = false; Resizable = true; ShowCustomCursor = true;
-		NotifySide = "Right";-- MenuFadeTime = 0; TabPadding = 2;
+		
+		NotifySide = "Right"; Center = true; AutoShow = false;
+		Resizable = true; ShowCustomCursor = true;
 	});
 
 	luna_xyz_env.Library.ForceCheckbox = true; 
@@ -104,9 +105,12 @@ function UICreator:CreateMainWindow()
 	});
 
 	local AccountGroup = HomeTab:AddLeftGroupbox("Account", "circle-user-round");
-
+	
 	local ScriptStatusGroup = HomeTab:AddRightGroupbox("Script Status", "scroll");
-	local AnalyticsGroup = HomeTab:AddRightGroupbox("Analytics", "chart-no-axes-combined");
+	local InfoGroupBox = HomeTab:AddRightTabbox("SYstemInfo");
+
+	local AnalyticsGroup = InfoGroupBox:AddTab("Analytics", "chart-no-axes-combined");
+	local KeyGroup = InfoGroupBox:AddTab("Key", "key-round");
 
 	AccountGroup:AddImage("MyImage", {
 
@@ -125,9 +129,7 @@ function UICreator:CreateMainWindow()
 	end):AddButton("Copy Link", function()
 
 		if not setclipboard then
-
-			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
-			return;
+			return Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
@@ -141,9 +143,7 @@ function UICreator:CreateMainWindow()
 		Func = function()
 			
 			if not setclipboard then
-
-				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
-				return;
+				return Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 			end;
 
 			setclipboard("https://scriptblox.com/u/00_lxh");
@@ -168,7 +168,8 @@ function UICreator:CreateMainWindow()
 
 	AnalyticsGroup:AddLabel(('Exploit: <b>%s - %s</b>'):format(identifyexecutor(), select(2, identifyexecutor())), true);
 	AnalyticsGroup:AddLabel(('Total Executions: <b>%s</b>'):format(luna_xyz_env.analytics_data.TotalExecutions), true);
-
+	
+	AnalyticsGroup:AddDivider();
 	AnalyticsGroup:AddLabel(('Total playtime: <b>%s</b>'):format(luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)])), true);
 	
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
@@ -187,6 +188,24 @@ function UICreator:CreateMainWindow()
 			end;
 		end;
 	end);
+	
+	local time_left = KeyGroup:AddLabel(('Time Left: <b>%s</b>'):format(luna_xyz_env:FormatTime((system_data.KeyData and system_data.KeyData.EXPIRES_AT or 0) - os.time())), true);
+	KeyGroup:AddLabel(('Created At: <b>%s</b>'):format(os.date("%m/%d/%y - %H:%M:%S", (system_data.KeyData and system_data.KeyData.CREATED_AT or 0))), true);
+	
+	task.spawn(function()
+		while task.wait(1) and luna_xyz_env and (system_data.KeyData and system_data.KeyData.EXPIRES_AT) do
+			
+			local current_time = (system_data.KeyData and system_data.KeyData.EXPIRES_AT or 0) - os.time();
+			
+			if current_time <= 0 then time_left:SetText('Time Left: <b>Key Expired</b>'); continue; end;
+			time_left:SetText(('Time Left: <b>%s</b>'):format(luna_xyz_env:FormatTime(current_time)));
+		end;
+	end);
+	
+	KeyGroup:AddDivider();
+	
+	KeyGroup:AddLabel(('Discord: <b>%s</b>'):format((system_data.DiscordData and system_data.DiscordData.DISCORD_USERNAME) or "Unknown"), true);
+	KeyGroup:AddLabel(('DiscordId: <b>%s</b>'):format((system_data.DiscordData and system_data.DiscordData.DISCORD_ID) or "Unknown"), true);
 
 	Logger.success("Home tab created.");
 
@@ -218,9 +237,9 @@ function UICreator:CreateKeyWindow(__callback)
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
-
-		Center = true; AutoShow = false; Resizable = true; ShowCustomCursor = true;
-		NotifySide = "Right";-- MenuFadeTime = 0; TabPadding = 2;
+		
+		NotifySide = "Right"; Center = true; AutoShow = true;
+		Resizable = true; ShowCustomCursor = true; Size = UDim2.fromOffset(625, 360);
 	});
 	
 	Logger.success("Key window loaded.");
@@ -230,8 +249,8 @@ function UICreator:CreateKeyWindow(__callback)
 	Logger.debug("Creating key tab..");
 	local KeyTab = Window:AddKeyTab("Key", "key-round");
 	
-	KeyTab:AddLabel('<b><font size="25">luna.xyz Beta Access</font></b>', true);
-	KeyTab:AddLabel("Your key grants you exclusive access to the beta version. Thank you for supporting the development of luna.xyz!", true);
+	KeyTab:AddLabel('<b><font size="25">luna.xyz Key System</font></b>', true);
+	KeyTab:AddLabel("Thanks for supporting & using luna.xyz. Your support help us to continue developing luna.xyz!", true);
 
 	KeyTab:AddKeyBox(__callback);
 	
@@ -246,7 +265,21 @@ function UICreator:CreateKeyWindow(__callback)
 	local KeyGroup = InfoTab:AddLeftGroupbox("Key", "info");
 	local HelpGroup = InfoTab:AddRightGroupbox("Help", "info");
 	
-	KeyGroup:AddLabel('Gain access by joining our Discord server and obtaining the <b><font color="rgb(72, 230, 132)">BETA TESTER</font></b> role. This ensures access to the private beta.', true);
+	KeyGroup:AddLabel('luna.xyz uses multiple ad providers for the key system. You can choose the one you like most.', true);
+	
+	KeyGroup:AddButton("Copy Link", function()
+
+		if not setclipboard then
+			return Notifications:Notify('Discord link: https://jnkie.com/get-key/luna-xyz', 10);
+		end;
+
+		setclipboard('https://jnkie.com/get-key/luna-xyz');
+		Notifications:Notify("Copied discord link to clipboard!");
+	end);
+	
+	KeyGroup:AddDivider();
+	KeyGroup:AddLabel('<b><font color="rgb(255, 0, 0)">WARING: Disable your adblocker before using linkvertise to prevent 1h wait time.</font></b>', true);
+	
 	HelpGroup:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
 	
 	HelpGroup:AddButton("Join Discord", function()
@@ -257,9 +290,7 @@ function UICreator:CreateKeyWindow(__callback)
 	end):AddButton("Copy Link", function()
 
 		if not setclipboard then
-
-			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
-			return;
+			return Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
@@ -303,10 +334,10 @@ function UICreator:CreateSettingsTab()
 	end;
 
 	local MenuGroup = SettingsTab:AddLeftGroupbox("Menu Options", "cog");
-	local UIGroup = SettingsTab:AddRightTabbox("UI");
+	local UIGroupBox = SettingsTab:AddRightTabbox("UI");
 
-	local UI_Tab = UIGroup:AddTab("UI", "app-window");
-	local NotificationsTab = UIGroup:AddTab("Notify", "bell");
+	local UI_Tab = UIGroupBox:AddTab("UI", "app-window");
+	local NotificationsTab = UIGroupBox:AddTab("Notify", "bell");
 
 	----- || MENU || -----
 
@@ -380,9 +411,7 @@ function UICreator:CreateSettingsTab()
 	end):AddButton("Copy Link", function()
 		
 		if not setclipboard then
-
-			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
-			return;
+			return Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
@@ -574,9 +603,7 @@ function UICreator:CreateCreditsTab()
 	end):AddButton("Copy Link", function()
 
 		if not setclipboard then
-
-			Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
-			return;
+			return Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 		end;
 
 		setclipboard(luna_xyz_env.discord_id);
@@ -590,9 +617,7 @@ function UICreator:CreateCreditsTab()
 		Func = function()
 
 			if not setclipboard then
-
-				Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
-				return;
+				return Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 			end;
 
 			setclipboard("https://scriptblox.com/u/00_lxh");
