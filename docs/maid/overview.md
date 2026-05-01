@@ -23,7 +23,13 @@ This distinction is important to avoid memory leaks and lingering connections af
 
 ### Available Functions
 
-<table><thead><tr><th>Function</th><th>Description</th><th data-hidden>Returns</th></tr></thead><tbody><tr><td><a href="new.md"><code>new</code></a></td><td>Creates a new Maid instance</td><td><code>boolean</code></td></tr><tr><td><a href="is-maid.md"><code>isMaid</code></a></td><td>Checks if a value is a Maid</td><td><code>boolean</code></td></tr><tr><td><a href="give-task.md"><code>GiveTask</code></a></td><td>Adds a task to the Maid</td><td><code>Instance</code></td></tr><tr><td><a href="give-promise.md"><code>GivePromise</code></a></td><td>Adds a promise for cleanup</td><td><code>Vector2</code></td></tr><tr><td><a href="do-cleaning.md"><code>DoCleaning</code></a></td><td>Cleans all tasks</td><td><code>Ray</code></td></tr></tbody></table>
+| Function                         | Description                 | Returns   |
+| -------------------------------- | --------------------------- | --------- |
+| [`new`](new.md)                  | Creates a new Maid instance | `maid`    |
+| [`isMaid`](is-maid.md)           | Checks if a value is a Maid | `boolean` |
+| [`GiveTask`](give-task.md)       | Adds a task to the Maid     | `number`  |
+| [`GivePromise`](give-promise.md) | Adds a promise for cleanup  | `Promise` |
+| [`DoCleaning`](do-cleaning.md)   | Cleans all tasks            | `nil`     |
 
 ***
 

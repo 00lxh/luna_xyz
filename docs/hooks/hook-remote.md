@@ -9,7 +9,7 @@ HookService:HookRemote(object: Instance|string, callback: function?) -> function
 ```
 
 {% hint style="warning" %}
-Your executor must have hookmetamethod.
+Your executor must have **hookmetamethod**.
 {% endhint %}
 
 ***

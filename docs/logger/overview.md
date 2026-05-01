@@ -1,34 +1,49 @@
 # Overview
 
-The Logger system provides a structured and customizable way to create, manage, and display logs within the **luna.xyz runtime**, including console output, file saving, and rich DevConsole visualization.
+The Logger system provides a dynamic and customizable way to create, update, and manage logs within the **luna.xyz runtime**, including real-time DevConsole rendering, live message updates, and optional file persistence.
 
 ***
 
 These functions allow you to:
 
-* Create categorized logs (event, warn, error, success, etc.)
+* Create categorized logs with dynamic updates
+* Modify logs after creation (message, type, color, timestamp)
 * Display logs with icons and colors in the DevConsole
-* Optionally print logs to the console
-* Save logs to files for persistence
-* Create dynamic loading/progress logs
-* Customize logging behavior (icons, saving, console output)
+* Track logs internally and clean them individually
+* Create animated loading/progress logs
+* Optionally print logs to console and save to files
 
-The Logger is globally accessible via `Logger` and automatically integrates with the DevConsole UI.
+Each log returns a **log module**, allowing real-time updates and manual cleanup.
 
 ***
 
 ### Available Functions
 
-<table><thead><tr><th>Function</th><th>Description</th><th data-hidden>Returns</th></tr></thead><tbody><tr><td><a href="../maid/new.md"><code>new</code></a></td><td>Creates a new Maid instance</td><td><code>boolean</code></td></tr><tr><td><a href="../maid/is-maid.md"><code>isMaid</code></a></td><td>Checks if a value is a Maid</td><td><code>boolean</code></td></tr><tr><td><a href="../maid/give-task.md"><code>GiveTask</code></a></td><td>Adds a task to the Maid</td><td><code>Instance</code></td></tr><tr><td><a href="../maid/give-promise.md"><code>GivePromise</code></a></td><td>Adds a promise for cleanup</td><td><code>Vector2</code></td></tr><tr><td><a href="../maid/do-cleaning.md"><code>DoCleaning</code></a></td><td>Cleans all tasks</td><td><code>Ray</code></td></tr></tbody></table>
+| Function                                      | Description                       | Returns       |
+| --------------------------------------------- | --------------------------------- | ------------- |
+| [`event`](event/)                             | Logs an event message             | `LogModule`   |
+| [`warn`](warn/)                               | Logs a warning message            | `LogModule`   |
+| [`error`](error/)                             | Logs an error message             | `LogModule`   |
+| [`success`](success/)                         | Logs a success message            | `LogModule`   |
+| [`debug`](debug/)                             | Logs debug information            | `LogModule`   |
+| [`info`](info/)                               | Logs general information          | `LogModule`   |
+| [`wait`](wait/)                               | Logs a waiting state              | `LogModule`   |
+| [`ready`](ready/)                             | Logs a ready state                | `LoaderOject` |
+| [`CreateLoading`](create-loading.md)          | Creates a dynamic loading log     | `nil`         |
+| [`ToggleLogs`](toggle-logs.md)                | Enables/disables file saving      | `nil`         |
+| [`SetSaveLocation`](set-save-location.md)     | Sets file save location           | `nil`         |
+| [`ToggleConsoleLogs`](toggle-console-logs.md) | Enables/disables console logs     | `nil`         |
+| [`ToggleIcons`](toggle-icons.md)              | Enables/disables icons            | `nil`         |
+| [`Destroy`](destroy.md)                       | Cleans all logs and stops updates | `nil`         |
 
 ***
 
 ### Usage
 
-All functions are called with colon syntax on `luna_xyz_env`:
+All functions are called with dot syntax on `Logger`:
 
 ```lua
-luna_xyz_env.Maid;
+Logger.FunctionName(args);
 ```
 
 

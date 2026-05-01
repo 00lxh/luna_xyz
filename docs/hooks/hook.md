@@ -9,7 +9,7 @@ HookService:Hook(callback: function, hookFn: function) -> function
 ```
 
 {% hint style="warning" %}
-Your executor must have hookfunction.
+Your executor must have **hookfunction**.
 {% endhint %}
 
 ***

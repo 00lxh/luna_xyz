@@ -9,7 +9,7 @@ HookService:DisableConnection(signal: RBXScriptSignal) -> nil
 ```
 
 {% hint style="warning" %}
-Your executor must have getconnections.
+Your executor must have **getconnections**.
 {% endhint %}
 
 ***

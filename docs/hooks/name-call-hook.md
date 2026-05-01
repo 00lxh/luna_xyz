@@ -9,7 +9,7 @@ HookService:NameCallHook(object: Instance|string, method: string, callback: func
 ```
 
 {% hint style="warning" %}
-Your executor must have hookmetamethod.
+Your executor must have **hookmetamethod**.
 {% endhint %}
 
 ***

@@ -9,7 +9,7 @@ HookService:IndexHook(object: Instance|string, property: string, value: any) -> 
 ```
 
 {% hint style="warning" %}
-Your executor must have hookmetamethod.
+Your executor must have **hookmetamethod**.
 {% endhint %}
 
 ***

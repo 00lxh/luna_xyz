@@ -13,7 +13,7 @@ Alias HookService:Destroy().
 {% endhint %}
 
 {% hint style="warning" %}
-Your executor must have getconnections, hookmetamethod, isfunctionhooked, restorefunction to restore hooks/connections.
+Your executor must have **getconnections**, **hookmetamethod**, **isfunctionhooked**, **restorefunction** to restore hooks/connections.
 {% endhint %}
 
 ***

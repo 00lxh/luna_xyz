@@ -24,7 +24,15 @@ This distinction is important to prevent leftover hooks and unintended behavior 
 
 ### Available Functions
 
-<table><thead><tr><th>Function</th><th>Description</th><th data-hidden>Returns</th></tr></thead><tbody><tr><td><a href="hook.md"><code>Hook</code></a></td><td>Hooks a function and overrides its behavior</td><td><code>boolean</code></td></tr><tr><td><a href="hook-remote.md"><code>HookRemote</code></a></td><td>Intercepts remote calls (<code>FireServer</code>, <code>InvokeServer</code>)</td><td><code>boolean</code></td></tr><tr><td><a href="name-call-hook.md"><code>NameCallHook</code></a></td><td>Hooks a specific namecall method on an object</td><td><code>Instance</code></td></tr><tr><td><a href="index-hook.md"><code>IndexHook</code></a></td><td>Overrides property access and assignment</td><td><code>Vector2</code></td></tr><tr><td><a href="disable-connection.md"><code>DisableConnection</code></a></td><td>Disables all connections of a signal</td><td><code>Ray</code></td></tr><tr><td><a href="enable-connection.md"><code>EnableConnection</code></a></td><td>Re-enables connections of a signal</td><td><code>boolean</code></td></tr><tr><td><a href="do-cleaning.md"><code>DoCleaning</code></a></td><td>Restores all hooks and cleans state</td><td></td></tr></tbody></table>
+| Function                                     | Description                                            | Returns              |
+| -------------------------------------------- | ------------------------------------------------------ | -------------------- |
+| [`Hook`](hook.md)                            | Hooks a function and overrides its behavior            | `function`           |
+| [`HookRemote`](hook-remote.md)               | Intercepts remote calls (`FireServer`, `InvokeServer`) | `function`           |
+| [`NameCallHook`](name-call-hook.md)          | Hooks a specific namecall method on an object          | `function`           |
+| [`IndexHook`](index-hook.md)                 | Overrides property access and assignment               | `function, function` |
+| [`DisableConnection`](disable-connection.md) | Disables all connections of a signal                   | `nil`                |
+| [`EnableConnection`](enable-connection.md)   | Re-enables connections of a signal                     | `nil`                |
+| [`DoCleaning`](do-cleaning.md)               | Restores all hooks and cleans state                    | `nil`                |
 
 ***
 
