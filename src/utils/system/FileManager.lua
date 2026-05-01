@@ -293,10 +293,6 @@ for _, file_path in pairs(listfiles("luna_xyz/logs")) do
 	delfile(file_path);
 end;
 
-if not isfile("luna_xyz/whaaaattt.mp3") and (crypt and crypt.base64decode) then
-	writefile("luna_xyz/whaaaattt.mp3", crypt.base64decode(game:HttpGet("https://raw.githubusercontent.com/00lxh/luna_xyz/refs/heads/main/assets/whaaaattt.txt")));
-end;
-
 if isfolder("luna_xyz/modules") then delfolder("luna_xyz/modules"); end;
 Logger.success(('Files integrity good. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
 
