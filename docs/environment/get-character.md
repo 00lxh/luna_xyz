@@ -8,6 +8,8 @@ Returns the character `Model` for a given player. If the character is not yet av
 luna_xyz_env:GetCharacter(player: Player) -> Model
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type     | Description                                        |
@@ -17,6 +19,8 @@ luna_xyz_env:GetCharacter(player: Player) -> Model
 {% hint style="warning" %}
 **This function may yield.** If the character has not spawned yet, the current thread will pause until it does. Avoid calling this in non-async contexts.
 {% endhint %}
+
+***
 
 ### Example
 

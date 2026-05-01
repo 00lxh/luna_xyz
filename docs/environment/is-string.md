@@ -8,6 +8,8 @@ Returns `true` only if the given value is of type `string` **and** is non-empty 
 luna_xyz_env:IsString(str: string) -> boolean
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type     | Description            |
@@ -17,6 +19,8 @@ luna_xyz_env:IsString(str: string) -> boolean
 {% hint style="info" %}
 Strings containing only whitespace (e.g. `" "`) return `false`.
 {% endhint %}
+
+***
 
 ### Example
 

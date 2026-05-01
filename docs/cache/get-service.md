@@ -8,6 +8,8 @@ The Cache service provides a secure way to store and manage instances within the
 luna_xyz_env:GetService("cache") -> Instance
 ```
 
+***
+
 ### Overview
 
 The Cache system allows you to:
@@ -17,12 +19,16 @@ The Cache system allows you to:
 * Safely manage temporary or sensitive objects
 * Control when and how instances become visible or interactable
 
+***
+
 ### Behavior
 
 Instances stored in the cache are **not accessible from the Workspace** by default.\
 They remain isolated in a secure folder managed by the runtime.
 
 To make a cached instance accessible or visible in-game, you must explicitly set its `Parent` to an object inside the `Workspace`.
+
+***
 
 ## Example
 

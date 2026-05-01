@@ -8,6 +8,8 @@ Returns the current screen-space mouse position as a `Vector2`, adjusted by the 
 luna_xyz_env:GetMousePosition() -> Vector2
 ```
 
+***
+
 ### Behavior
 
 | Device      | Behavior                                                                       |
@@ -18,6 +20,8 @@ luna_xyz_env:GetMousePosition() -> Vector2
 {% hint style="info" %}
 On touch devices there is no persistent cursor, so the screen center is used as a sensible fallback.
 {% endhint %}
+
+***
 
 ### Example
 

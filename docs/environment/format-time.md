@@ -8,11 +8,15 @@ Formats a duration in seconds into a zero-padded `DD:HH:MM:SS` string, suitable 
 luna_xyz_env:FormatTime(t: number) -> string
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type     | Description                                                       |
 | --------- | -------- | ----------------------------------------------------------------- |
 | `t`       | `number` | Duration in seconds (e.g. from `os.clock()` or a `tick()` delta). |
+
+***
 
 ### Format
 
@@ -23,6 +27,8 @@ DD:HH:MM:SS
 │  └─────── Hours    (00–23)
 └────────── Days     (00+)
 ```
+
+***
 
 ### Example
 

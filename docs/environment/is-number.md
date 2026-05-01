@@ -8,6 +8,8 @@ Returns `true` if the given value is of type `number` and is not `NaN` (Not a Nu
 luna_xyz_env:IsNumber(num: number) -> boolean
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type     | Description            |
@@ -17,6 +19,8 @@ luna_xyz_env:IsNumber(num: number) -> boolean
 {% hint style="info" %}
 `NaN` is detected using the self-equality trick: `num == num` returns `false` only for `NaN`.
 {% endhint %}
+
+***
 
 ### Example
 

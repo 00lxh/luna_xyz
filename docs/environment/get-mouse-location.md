@@ -8,12 +8,16 @@ Converts the result of [`GetMousePosition`](get-mouse-position.md) into a world-
 luna_xyz_env:GetMouseLocation() -> Ray
 ```
 
+***
+
 ### Behavior
 
 | Device      | Method Used                       |
 | ----------- | --------------------------------- |
 | **Touch**   | `Camera:ViewportPointToRay(x, y)` |
 | **Desktop** | `Camera:ScreenPointToRay(x, y)`   |
+
+***
 
 ### Example
 

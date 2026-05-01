@@ -8,6 +8,8 @@ Safely retrieves a Roblox service by name. Returns a cloned reference via `clone
 luna_xyz_env:GetService(serviceName: string) -> Instance
 ```
 
+***
+
 ### Parameters
 
 | Parameter     | Type     | Description                                 |
@@ -18,12 +20,18 @@ luna_xyz_env:GetService(serviceName: string) -> Instance
 `serviceName` must be a `string`. Passing any other type will throw a type error.
 {% endhint %}
 
+***
+
 ### Special Cases
 
 | Value                    | Behavior                                                             |
 | ------------------------ | -------------------------------------------------------------------- |
 | `"cache"`                | Returns the internal `luna_cache` folder instead of a Roblox service |
 | Any key in `loaded_libs` | Returns the pre-loaded library from `luna_xyz_env.loaded_libs`       |
+
+<p align="center">More info about cache <a href="/broken/pages/GdafDw4SzJJZlWHW18LM">here</a>.</p>
+
+***
 
 ## Example
 

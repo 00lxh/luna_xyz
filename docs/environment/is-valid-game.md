@@ -8,6 +8,8 @@ Checks whether the provided game identifier exists in `luna_xyz_env.supported_ga
 luna_xyz_env:IsValidGame(obj: any) -> boolean
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type  | Description                                                                     |
@@ -17,6 +19,8 @@ luna_xyz_env:IsValidGame(obj: any) -> boolean
 {% hint style="warning" %}
 This function will **error** if `obj` is `nil` — it asserts `"argument 1 missing or nil"`.
 {% endhint %}
+
+***
 
 ### Example
 

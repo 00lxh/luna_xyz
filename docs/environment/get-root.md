@@ -8,11 +8,15 @@ Returns the primary movement part of a player's character. Searches in priority 
 luna_xyz_env:GetRoot(player: Player) -> BasePart?
 ```
 
+***
+
 ### Parameters
 
 | Parameter | Type     | Description                   |
 | --------- | -------- | ----------------------------- |
 | `player`  | `Player` | The target `Player` instance. |
+
+***
 
 ### Priority Order
 
@@ -25,6 +29,8 @@ luna_xyz_env:GetRoot(player: Player) -> BasePart?
 {% hint style="info" %}
 Returns `nil` if none of the three parts are found (e.g. custom rigs). Always nil-check the result.
 {% endhint %}
+
+***
 
 ### Example
 
