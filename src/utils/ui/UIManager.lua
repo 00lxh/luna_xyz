@@ -73,9 +73,17 @@ local function GetGreeting()
 	return "Good evening";
 end;
 
+local function GetStatus()
+	
+	local isBeta = getgenv().luna_xyz_beta and luna_xyz_env.IS_PREMIUM;
+	return (isBeta and '<font color="rgb(170, 85, 255)">🧪 Beta Tester</font>') or (luna_xyz_env.IS_PREMIUM and '<font color="rgb(255, 255, 0)">✨ Premium</font>') or '🔓 Free';
+end;
+
 function UICreator:CreateMainWindow(system_data)
 
 	system_data = system_data or {};
+	luna_xyz_env.IS_PREMIUM = (system_data.KeyData and system_data.KeyData.PREMIUM_KEY) or false;
+	
 	Logger.debug("Loading main window..");
 
 	local Window = luna_xyz_env.Library:CreateWindow({
@@ -118,7 +126,7 @@ function UICreator:CreateMainWindow(system_data)
 		Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
 	});
 
-	AccountGroup:AddLabel(('%s, %s - <b>Member</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName), true);
+	AccountGroup:AddLabel(('%s, %s\n» <b>%s</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName, GetStatus(system_data)), true);
 	AccountGroup:AddDivider();
 
 	AccountGroup:AddButton("Join Discord", function()
