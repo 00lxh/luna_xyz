@@ -106,7 +106,7 @@ local function createAddonEnv(layout, addonName)
 		end,
 
 		__index = function(_, key)
-			return rawget(env, key) or luna_xyz_env[key] or getrenv()[key];
+			return rawget(env, key) or luna_xyz_env[key] or getrenv()[key] or getgenv()[key];
 		end,
 	});
 	
