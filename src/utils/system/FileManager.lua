@@ -253,14 +253,14 @@ for folder_name, folder_data in pairs(luna_files) do
 		if file_data._t == "folder" and not isfolder(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name))) then
 
 			makefolder(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name)));
-			Logger.debug('The folder "luna_xyz/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name));
+			Logger.debug(('The folder "luna_xyz/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name)));
 
 			for a, b in pairs(file_data.content) do
 
 				writefile(('luna_xyz/%s/%s/%s'):format(tostring(folder_name), tostring(file_name), tostring(a)), tostring(b));
 				if isfile(('luna_xyz/%s/%s/%s'):format(tostring(folder_name), tostring(file_name), tostring(a))) then continue; end;
 				
-				Logger.debug('The file "luna_xyz/%s/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name), tostring(a));
+				Logger.debug(('The file "luna_xyz/%s/%s/%s" was not found, Creaitng a new one..'):format(tostring(folder_name), tostring(file_name), tostring(a)));
 			end;
 
 		elseif file_data._t == "file" and not isfile(('luna_xyz/%s/%s'):format(tostring(folder_name), tostring(file_name))) then
