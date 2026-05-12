@@ -161,8 +161,6 @@ function UICreator:CreateMainWindow(system_data)
 
 	for name, info in pairs(luna_xyz_env.supported_games) do
 
-		if info.GameId == 142823291 then continue; end;
-
 		local placeName = name:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
 			return a:upper() .. b:lower();
 		end);
@@ -555,7 +553,7 @@ function UICreator:CreateSettingsTab()
 
 	luna_xyz_env.Maid:GiveTask(Players.LocalPlayer.OnTeleport:Connect(function()
 
-		if not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or getgenv().queued_to_teleport then return; end;
+		if not queue_on_teleport or not luna_xyz_env.Toggles.ExecuteOnTeleport.Value or queued_to_teleport then return; end;
 		getgenv().queued_to_teleport = true;
 
 		queue_on_teleport([[ loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/fac6b129defbda2cf7d7a4cfaf9a7ae28589934ccb46cb06858577fd2c34e64b/download"))(); ]]);
