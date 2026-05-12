@@ -119,5 +119,5 @@ function Notifications:ToggleSound(value: boolean)
 	Notifications.NotifySound = luna_xyz_env:ParseBoolean(value);
 end;
 
-function luna_xyz_env:Notify(...) Notifications:Notify(...); end;
+luna_xyz_env.Notify = Notifications.Notify;
 return Notifications;
