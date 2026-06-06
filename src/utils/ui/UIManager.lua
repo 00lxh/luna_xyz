@@ -74,7 +74,7 @@ local function GetGreeting()
 end;
 
 local function GetStatus()
-	
+
 	local isBeta = getgenv().luna_xyz_beta and luna_xyz_env.IS_PREMIUM;
 	return (isBeta and '<font color="rgb(170, 85, 255)">🧪 Beta Tester</font>') or (luna_xyz_env.IS_PREMIUM and '<font color="rgb(255, 255, 0)">✨ Premium</font>') or '🔓 Free';
 end;
@@ -83,7 +83,7 @@ function UICreator:CreateMainWindow(system_data)
 
 	system_data = system_data or {};
 	luna_xyz_env.IS_PREMIUM = (system_data.KeyData and system_data.KeyData.PREMIUM_KEY) or false;
-	
+
 	Logger.debug("Loading main window..");
 
 	local Window = luna_xyz_env.Library:CreateWindow({
@@ -93,7 +93,7 @@ function UICreator:CreateMainWindow(system_data)
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
-		
+
 		NotifySide = "Right"; Center = true; AutoShow = false;
 		Resizable = true; ShowCustomCursor = true;
 	});
@@ -113,7 +113,7 @@ function UICreator:CreateMainWindow(system_data)
 	});
 
 	local AccountGroup = HomeTab:AddLeftGroupbox("Account", "circle-user-round");
-	
+
 	local ScriptStatusGroup = HomeTab:AddRightGroupbox("Script Status", "scroll");
 	local InfoGroupBox = HomeTab:AddRightTabbox("SYstemInfo");
 
@@ -149,7 +149,7 @@ function UICreator:CreateMainWindow(system_data)
 		Text = "Scriptblox Profile";
 
 		Func = function()
-			
+
 			if not setclipboard then
 				return Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
 			end;
@@ -174,16 +174,16 @@ function UICreator:CreateMainWindow(system_data)
 
 	AnalyticsGroup:AddLabel(('Exploit: <b>%s - %s</b>'):format(identifyexecutor(), select(2, identifyexecutor())), true);
 	AnalyticsGroup:AddLabel(('Total Executions: <b>%s</b>'):format(luna_xyz_env.analytics_data.TotalExecutions), true);
-	
+
 	AnalyticsGroup:AddDivider();
 	AnalyticsGroup:AddLabel(('Total playtime: <b>%s</b>'):format(luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)])), true);
-	
+
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
 	local startTime = os.clock();
 
 	task.spawn(function()
 		while task.wait(1) and luna_xyz_env do
-			
+
 			local elapsed = math.floor(os.clock() - startTime);
 
 			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
@@ -194,22 +194,22 @@ function UICreator:CreateMainWindow(system_data)
 			end;
 		end;
 	end);
-	
+
 	local time_left = KeyGroup:AddLabel(('Time Left: <b>%s</b>'):format(luna_xyz_env:FormatTime((system_data.KeyData and system_data.KeyData.EXPIRES_AT or 0) - os.time())), true);
 	KeyGroup:AddLabel(('Created At: <b>%s</b>'):format(os.date("%m/%d/%y - %H:%M:%S", (system_data.KeyData and system_data.KeyData.CREATED_AT or 0))), true);
-	
+
 	task.spawn(function()
 		while task.wait(1) and luna_xyz_env and (system_data.KeyData and system_data.KeyData.EXPIRES_AT) do
-			
+
 			local current_time = (system_data.KeyData and system_data.KeyData.EXPIRES_AT or 0) - os.time();
-			
+
 			if current_time <= 0 then time_left:SetText('Time Left: <b>Key Expired</b>'); continue; end;
 			time_left:SetText(('Time Left: <b>%s</b>'):format(luna_xyz_env:FormatTime(current_time)));
 		end;
 	end);
-	
+
 	KeyGroup:AddDivider();
-	
+
 	KeyGroup:AddLabel(('Discord: <b>%s</b>'):format((system_data.DiscordData and system_data.DiscordData.DISCORD_USERNAME) or "Unknown"), true);
 	KeyGroup:AddLabel(('DiscordId: <b>%s</b>'):format((system_data.DiscordData and system_data.DiscordData.DISCORD_ID) or "Unknown"), true);
 
@@ -221,7 +221,7 @@ function UICreator:CreateMainWindow(system_data)
 
 		if luna_xyz_env:GetService("Cache") then luna_xyz_env:GetService("Cache"):Destroy(); end;
 		luna_xyz_env.Maid:DoCleaning(); luna_xyz_env.HookService:DoCleaning();
-		
+
 		luna_xyz_env.Library.Unloaded = true;
 		mstudio45_ESP:Destroy();
 
@@ -243,36 +243,36 @@ function UICreator:CreateKeyWindow(__callback)
 
 		IconSize = UDim2.fromOffset(20, 20);
 		Icon = "rbxassetid://5012126105";
-		
+
 		NotifySide = "Right"; Center = true; AutoShow = true;
 		Resizable = true; ShowCustomCursor = true; Size = UDim2.fromOffset(625, 360);
 	});
-	
+
 	Logger.success("Key window loaded.");
-	
+
 	----- || KEY || -----
-	
+
 	Logger.debug("Creating key tab..");
 	local KeyTab = Window:AddKeyTab("Key", "key-round");
-	
+
 	KeyTab:AddLabel('<b><font size="25">luna.xyz Key System</font></b>', true);
 	KeyTab:AddLabel("Thanks for supporting & using luna.xyz. Your support help us to continue developing luna.xyz!", true);
 
 	KeyTab:AddKeyBox(__callback);
-	
+
 	KeyTab:AddLabel('Are you lost? Go to <b><font color="rgb(172, 215, 230)">Info</font></b> tab', true);
 	Logger.success("Key tab created.");
 
 	----- || INFO || -----
-	
+
 	Logger.debug("Creating info tab..");
 	local InfoTab = Window:AddTab("Info", "info");
-	
+
 	local KeyGroup = InfoTab:AddLeftGroupbox("Key", "info");
 	local HelpGroup = InfoTab:AddRightGroupbox("Help", "info");
-	
+
 	KeyGroup:AddLabel('luna.xyz uses multiple ad providers for the key system. You can choose the one you like most.', true);
-	
+
 	KeyGroup:AddButton("Copy Link", function()
 
 		if not setclipboard then
@@ -282,12 +282,12 @@ function UICreator:CreateKeyWindow(__callback)
 		setclipboard('https://jnkie.com/get-key/luna-xyz');
 		Notifications:Notify("Copied discord link to clipboard!");
 	end);
-	
+
 	KeyGroup:AddDivider();
 	KeyGroup:AddLabel('<b><font color="rgb(255, 0, 0)">WARING: Disable your adblocker before using linkvertise to prevent 1h wait time.</font></b>', true);
-	
+
 	HelpGroup:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
-	
+
 	HelpGroup:AddButton("Join Discord", function()
 
 		Inviter.Join(luna_xyz_env.discord_id);
@@ -302,10 +302,10 @@ function UICreator:CreateKeyWindow(__callback)
 		setclipboard(luna_xyz_env.discord_id);
 		Notifications:Notify("Copied discord link to clipboard!");
 	end);
-	
+
 	HelpGroup:AddButton("Unload", function() luna_xyz_env.Library:Unload(); end);
 	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
-	
+
 	Logger.success("Info tab created.");
 
 	----- || UNLOAD HANDLER || -----
@@ -321,7 +321,7 @@ function UICreator:CreateKeyWindow(__callback)
 		getgenv().luna_xyz_env = nil; getgenv().luna_xyz_addons = nil;
 		getgenv().luna_xyz_loading = nil; getgenv().luna_xyz_loaded = nil;
 	end);
-	
+
 	return Window;
 end;
 
@@ -392,11 +392,11 @@ function UICreator:CreateSettingsTab()
 	MenuGroup:AddToggle("ExecuteOnTeleport", {
 		Text = "Execute on Teleport"; Default = false;
 	});
-	
+
 	MenuGroup:AddToggle("DiscordRichPresence", {
 		Text = "Discord Rich Presence"; Default = true;
 	});
-	
+
 	MenuGroup:AddToggle("CreateLogs", {
 
 		Text = "Create Logs";
@@ -415,7 +415,7 @@ function UICreator:CreateSettingsTab()
 		Inviter.Prompt({ name = "luna.xyz"; invite = luna_xyz_env.discord_id; });
 
 	end):AddButton("Copy Link", function()
-		
+
 		if not setclipboard then
 			return Notifications:Notify(('Discord link: %s'):format(luna_xyz_env.discord_id), 10);
 		end;
@@ -430,9 +430,9 @@ function UICreator:CreateSettingsTab()
 
 	UI_Tab:AddLabel("Menu keybind"):AddKeyPicker("MenuKeybind", { Default = "LeftAlt", NoUI = true, Text = "Menu keybind" });
 	luna_xyz_env.Library.ToggleKeybind = luna_xyz_env.Options.MenuKeybind;
-	
+
 	UI_Tab:AddDropdown("DPIDropdown", {
-		
+
 		Text = "DPI Scale"; Default = "100%";
 		Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" };
 
@@ -458,7 +458,7 @@ function UICreator:CreateSettingsTab()
 	});
 
 	NotificationsTab:AddDropdown("NotificationStyle", {
-		
+
 		Text = "Notification Style"; Default = "luna.xyz";
 		Values = { "luna.xyz" };
 
@@ -466,11 +466,11 @@ function UICreator:CreateSettingsTab()
 			Notifications:SetNotifyTpe(value);
 		end;
 	});
-	
+
 	for i, v in pairs(Notifications:GetCustomNotifications()) do
 		luna_xyz_env.Options.NotificationStyle:AddValues(i);
 	end;
-	
+
 	NotificationsTab:AddToggle("NotificationSound", {
 
 		Text = "Notification Sound";
