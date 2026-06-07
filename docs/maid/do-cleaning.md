@@ -8,8 +8,12 @@ Cleans all registered tasks.
 Maid:DoCleaning() -> nil
 ```
 
+{% hint style="danger" %}
+Using **luna\_xyz\_env.Maid:DoCleaning()** will break the entire script.
+{% endhint %}
+
 {% hint style="info" %}
-Alias Maid:Destroy().
+Alias Maid:Destroy();
 {% endhint %}
 
 ***
