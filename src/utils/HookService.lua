@@ -24,7 +24,7 @@ function HookingService:HookRemote(Object, __callback)
 
 	local Old_Namecall; Old_Namecall = hookmetamethod(game, "__namecall", newcclosure(function(self, ...)
 
-		if (getnamecallmethod() == "FireServer" or getnamecallmethod() == "InvokeServer") and (typeof(Object) ~= "string" and self == Object or tostring(self) == tostring(Object)) then
+		if (getnamecallmethod() == "FireServer" or getnamecallmethod() == "InvokeServer" or getnamecallmethod() == "Fire") and (typeof(Object) ~= "string" and self == Object or tostring(self) == tostring(Object)) then
 			return __callback(self, ...);
 		end;
 
