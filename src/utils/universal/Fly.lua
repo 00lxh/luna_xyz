@@ -1,4 +1,4 @@
-local Fly = { FlyBody = nil; FlyGyro = nil; Enabled = false; Speed = 15; Loaded = false };
+local Fly = { FlyBody = nil; FlyGyro = nil; Enabled = false; Speed = 50; Loaded = false };
 
 local ControlModule = luna_xyz_env:GetService("ControlModule");
 local CurrentCamera = workspace.CurrentCamera;
