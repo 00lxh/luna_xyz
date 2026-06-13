@@ -146,20 +146,22 @@ function UICreator:CreateMainWindow(system_data)
 
 	AccountGroup:AddButton({
 
-		Text = "Scriptblox Profile";
+		Text = "Copy Key Link";
 
 		Func = function()
 
 			if not setclipboard then
-				return Notifications:Notify("Scriptblox link: https://scriptblox.com/u/00_lxh", 10);
+				return Notifications:Notify("Key link: https://jnkie.com/get-key/luna-xyz", 10);
 			end;
 
-			setclipboard("https://scriptblox.com/u/00_lxh");
+			setclipboard("https://jnkie.com/get-key/luna-xyz");
 			Notifications:Notify("Copied Scriptblox link to clipboard!");
 		end;
 	});
 
 	for name, info in pairs(luna_xyz_env.supported_games) do
+		
+		if info.Hidden then continue; end;
 
 		local placeName = name:gsub("_", " "):gsub("(%a)(%w*)", function(a, b)
 			return a:upper() .. b:lower();
