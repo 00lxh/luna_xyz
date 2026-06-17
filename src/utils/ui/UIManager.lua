@@ -574,7 +574,7 @@ function UICreator:CreateCreditsTab()
 
 	local OwnersSection = CreditsTab:AddLeftGroupbox("Owners", "moon");
 
-	--local DevelopersSection = CreditsTab:AddLeftGroupbox("Developers", "scroll");
+	local DevelopersSection = CreditsTab:AddLeftGroupbox("Developers", "scroll");
 	local TestersSection = CreditsTab:AddLeftGroupbox("Testers", "flask-conical");
 
 	local ContributorsSection = CreditsTab:AddRightGroupbox("Contributors", "puzzle");
@@ -585,15 +585,18 @@ function UICreator:CreateCreditsTab()
 	OwnersSection:AddLabel('[<font color="rgb(255, 200, 76)">00._lxh</font>] - Owner of luna.xyz', true);
 
 	----- || DEVELOPERS || ----
+	
+	DevelopersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Original owner of Violence District Script', true);
 
 	----- || TESTERS || -----
 
-	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen, Violence District', true);
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of rakoof, project lazarus', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">Mr.Storm</font>] - Tester of Violence District', true);
 
 	----- || CONTRIBUTORS || -----
 
-	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with rakoof, rake remastered, project lazarus', true);
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with rakoof, rake remastered, project lazarus, Violence District', true);
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">Ryo Yamada</font>] - Helped with revenant sunrisen', true);
 
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">deividcomsono</font>] - Obsidian UI library developer', true);
