@@ -355,7 +355,9 @@ function UICreator:CreateSettingsTab()
 		Default = true;
 
 		Callback = function(value)
-
+			
+			if not luna_xyz_env.waterMark then return; end;
+			luna_xyz_env.waterMark:SetVisible(value);
 		end;
 	});
 
