@@ -12,7 +12,9 @@ local ThemeManager = luna_xyz_env:GetService("ThemeManager");
 local SaveManager = luna_xyz_env:GetService("SaveManager");
 
 luna_xyz_env.Toggles = getgenv().Library.Toggles;
+
 luna_xyz_env.Options = getgenv().Library.Options;
+luna_xyz_env.Labels = getgenv().Library.Labels;
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
