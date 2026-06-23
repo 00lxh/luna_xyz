@@ -78,7 +78,7 @@ end;
 local function GetStatus()
 
 	local isBeta = getgenv().luna_xyz_beta and luna_xyz_env.IS_PREMIUM;
-	return (isBeta and '<font color="rgb(170, 85, 255)">🧪 Beta Tester</font>') or (luna_xyz_env.IS_PREMIUM and '<font color="rgb(255, 255, 0)">✨ Premium</font>') or '🔓 Free';
+	return (isBeta and '<font color="rgb(170, 85, 255)">🧪 Beta Tester</font>') or (luna_xyz_env.IS_PREMIUM and '<font color="rgb(255, 255, 0)">✨ Premium</font>') or '🔓 Freemium';
 end;
 
 function UICreator:CreateMainWindow(system_data)
