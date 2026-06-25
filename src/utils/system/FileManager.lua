@@ -93,6 +93,12 @@ local delfolder = delfolder or function(path)
 	FileManager[path] = nil;
 end;
 
+local analytics_data_template = {
+
+	["executor"] = identifyexecutor();
+	["TotalExecutions"] = 0; ["PlayTime"] = { [tostring(Players.LocalPlayer)] = 0; };
+};
+
 local modules_list = {
 	
 	{ name = "system", data = {
@@ -134,8 +140,8 @@ local modules_list = {
 
 local luna_files = {
 
-	["addons"] = {}; ["analytics"] = {};
-	["assets"] = {}; ["saves"] = {};
+	["addons"] = {}; ["notifications"] = {};
+	["analytics"] = {}; ["assets"] = {}; ["saves"] = {};
 
 	["core"] = {
 		["WARNING.txt"] = { _t = "file"; content = "WARNING:\nDO NOT DELETE THESE FILES!\n\nThis may have unexpected consequences and may break your linked key if you have one. Only use the 'Erase Local Files' button if you need these to be erased.\n\n- Thank you <3!"; };
@@ -155,10 +161,11 @@ local luna_files = {
 	};
 };
 
-local analytics_data_template = {
-
-	["executor"] = identifyexecutor();
-	["TotalExecutions"] = 0; ["PlayTime"] = { [tostring(Players.LocalPlayer)] = 0; };
+local luna_assets = {
+	
+	"https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v1.png?raw=true";
+	"https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v2.png?raw=true";
+	"https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v3.png?raw=true";
 };
 
 ----- || METHODS || -----
@@ -325,6 +332,29 @@ luna_xyz_env.analytics_data = analytics_data;
 writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data));
 Logger.success(('Loaded analytics data. - (%s)'):format(string.format("%.2f", os.clock() - startTime2)));
 
+----- || ASSETS CHECK || -----
+
+startTime = os.clock();
+Logger.debug("Fetching luna.xyz assets..");
+
+for _, image_url in ipairs(luna_assets) do
+
+	local image_path = ("luna_xyz/assets/%s"):format(image_url:match(".*/([^?]+)"));
+	Logger.debug(('Checking asset: %s'):format(image_path));
+	
+	startTime2 = os.clock();
+	
+	if not isfile(image_path) then
+		
+		writefile(image_path, game:HttpGet(image_url));
+		Logger.info(('Asset %s updated. - (%s)'):format(image_path, string.format("%.2f", os.clock() - startTime2)));
+	end;
+	
+	Logger.success(('The Asset %s loaded successfully. - (%s)'):format(image_path, string.format("%.2f", os.clock() - startTime2)));
+end;
+
+Logger.success(('Loaded luna.xyz assets. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
+
 ----- || MODULES CHECK || -----
 
 startTime = os.clock();
@@ -343,7 +373,7 @@ for _, module in ipairs(modules_list) do
 	end;
 end;
 
-Logger.success(('Loaded luna.xyz modules. - (%s)'):format(string.format("%.2f", os.clock() - startTime)))	;
+Logger.success(('Loaded luna.xyz modules. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
 FileManager.FilesLoaded = true;
 
 return FileManager;
