@@ -43,12 +43,12 @@ end;
 function Notifications:GetCustomNotifications()
 	
 	customNotifications = {};
-	if not luna_xyz_env._SupportsFileSystem or #listfiles("luna_xyz/assets") <= 0 then return customNotifications; end;
+	if not luna_xyz_env._SupportsFileSystem or #listfiles("luna_xyz/notifications") <= 0 then return customNotifications; end;
 	
 	local startTime = os.clock();
 	Logger.debug("Loading custom notifications..");
 	
-	for i, v in pairs(listfiles("luna_xyz/assets")) do
+	for i, v in pairs(listfiles("luna_xyz/notifications")) do
 
 		local startTime2 = os.clock(); local notification_name = v:match(".+\\(.+)") or v;
 		Logger.debug('Loading custom notification ' .. notification_name .. '..');
