@@ -3,9 +3,16 @@ local UICreator = {};
 local HttpService = luna_xyz_env:GetService("HttpService");
 local Players = luna_xyz_env:GetService("Players");
 
-local Inviter = luna_xyz_env:GetService("DiscordInvites");
+local StatsService = luna_xyz_env:GetService("Stats");
+local RunService = luna_xyz_env:GetService("RunService");
 
+local serverStats = StatsService:FindFirstChild("Network") and StatsService.Network:FindFirstChild("ServerStatsItem");
+local pingStats = serverStats and serverStats:FindFirstChild("Data Ping");
+
+local floor = math.floor;
 luna_xyz_env.Library = luna_xyz_env:GetService("Library");
+
+local Inviter = luna_xyz_env:GetService("DiscordInvites");
 local Notifications = luna_xyz_env:GetService("Notify");
 
 local ThemeManager = luna_xyz_env:GetService("ThemeManager");
@@ -15,6 +22,7 @@ luna_xyz_env.Toggles = getgenv().Library.Toggles;
 
 luna_xyz_env.Options = getgenv().Library.Options;
 luna_xyz_env.Labels = getgenv().Library.Labels;
+
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
@@ -183,14 +191,14 @@ function UICreator:CreateMainWindow(system_data)
 	AnalyticsGroup:AddLabel(('Total playtime: <b>%s</b>'):format(luna_xyz_env:FormatTime(luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)])), true);
 
 	local time_elapsed = AnalyticsGroup:AddLabel("Time Elapsed: <b>00:00:00:00</b>", true);
-	local startTime = os.clock();
-
+	local startTime, previousPlayTime = os.clock(), (luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] or 0);
+	
 	task.spawn(function()
 		while task.wait(1) and luna_xyz_env do
 
 			local elapsed = math.floor(os.clock() - startTime);
 
-			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = elapsed;
+			luna_xyz_env.analytics_data.PlayTime[tostring(Players.LocalPlayer)] = previousPlayTime + elapsed;
 			time_elapsed:SetText(('Time Elapsed: <b>%s</b>'):format(luna_xyz_env:FormatTime(elapsed)));
 
 			if (elapsed % 10) == 0 then
@@ -218,6 +226,33 @@ function UICreator:CreateMainWindow(system_data)
 	KeyGroup:AddLabel(('DiscordId: <b>%s</b>'):format((system_data.DiscordData and system_data.DiscordData.DISCORD_ID) or "Unknown"), true);
 
 	Logger.success("Home tab created.");
+	
+	----- || WATERMARK || -----
+	
+	local waterMark = luna_xyz_env.Library:AddDraggableLabel(('%s - luna.xyz | %s FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, "N/A", "N/A", tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
+	local deltaTimesInterval, frame_count, current_fps, lastUpdated, updateInterval = 0, 0, 0, os.clock(), 0.3;
+	
+	pcall(function()
+		luna_xyz_env.Maid:GiveTask(RunService.RenderStepped:Connect(function(delta)
+			
+			deltaTimesInterval += delta;
+			frame_count += 1;
+			
+			local current_time = os.clock();
+
+			if (current_time - lastUpdated) >= updateInterval then
+
+				current_fps = frame_count / deltaTimesInterval;
+				deltaTimesInterval, frame_count = 0, 0; lastUpdated = current_time;
+			end;
+			
+			local current_ping = pingStats and floor(pingStats:GetValue()) or "N/A";
+			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, current_ping, luna_xyz_env.versions[luna_xyz_env.ScriptLoader]));
+		end));
+	end);
+
+	luna_xyz_env.waterMark = waterMark;
+	luna_xyz_env.waterMark:SetVisible(true);
 
 	----- || UNLOAD HANDLER || -----
 
@@ -594,7 +629,9 @@ function UICreator:CreateCreditsTab()
 
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen, Violence District', true);
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of rakoof, project lazarus', true);
+	
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">Mr.Storm</font>] - Tester of Violence District', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">88404</font>] - Tester of Violence District', true);
 
 	----- || CONTRIBUTORS || -----
 
