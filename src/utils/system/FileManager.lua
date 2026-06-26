@@ -204,7 +204,7 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 
 	if not __s then
 
-		Logger.error(('Failed to fetch module %s.lua - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
+		Logger.error(('Failed to fetch module %s.lua - (%.2f)'):format(module_path, os.clock() - startTime));
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
@@ -221,7 +221,7 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 		writefile("luna_xyz/hash_cache.json", HttpService:JSONEncode(hash_cache));
 
 		writefile(local_file, __d);
-		Logger.info(('Module %s.lua updated. - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
+		Logger.info(('Module %s.lua updated. - (%.2f)'):format(module_path, os.clock() - startTime));
 	end;
 
 	local __s, __d = pcall(function()
@@ -230,14 +230,14 @@ function FileManager:LoadModule(module_path: string, module_data: string)
 
 	if not __s then
 
-		Logger.error(('Failed to load module %s.lua - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
+		Logger.error(('Failed to load module %s.lua - (%.2f)'):format(module_path, os.clock() - startTime));
 		Logger.error('    RUNTIME ERROR: ' .. tostring(__d));
 
 		return;
 	end;
 	
 	luna_xyz_env.loaded_libs[module_path:match(".+/(.+)") or module_path] = __d;
-	Logger.success(('The module %s.lua loaded successfully. - (%s)'):format(module_path, string.format("%.2f", os.clock() - startTime)));
+	Logger.success(('The module %s.lua loaded successfully. - (%.2f)'):format(module_path, os.clock() - startTime));
 end;
 
 ----- || FILE CHECK || -----
@@ -296,12 +296,12 @@ for _, file_path in pairs(listfiles("luna_xyz/logs")) do
 	local delete_days = 10;
 	if not (difference >= (delete_days * 24 * 60 * 60)) then continue; end;
 
-	Logger.warn(('Deleting log file "%s" because is 10 days old. - (%s)'):format(tostring(file_path):gsub("\\", "/"), string.format("%.2f", os.clock() - startTime2)));
+	Logger.warn(('Deleting log file "%s" because is 10 days old. - (%.2f)'):format(tostring(file_path):gsub("\\", "/"), os.clock() - startTime2));
 	delfile(file_path);
 end;
 
 if isfolder("luna_xyz/modules") then delfolder("luna_xyz/modules"); end;
-Logger.success(('Files integrity good. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
+Logger.success(('Files integrity good. - (%.2f)'):format(os.clock() - startTime));
 
 ----- || CACHE CHECK || -----
 
@@ -312,7 +312,7 @@ if isfile("luna_xyz/hash_cache.json") then
 	hash_cache = HttpService:JSONDecode(readfile("luna_xyz/hash_cache.json"));
 end;
 
-Logger.success(('Loaded cache data. - (%s)'):format(string.format("%.2f", os.clock() - startTime2)));
+Logger.success(('Loaded cache data. - (%.2f)'):format(os.clock() - startTime2));
 
 ----- || ANALITYCS CHECK || -----
 
@@ -330,7 +330,7 @@ analytics_data.TotalExecutions += 1;
 luna_xyz_env.analytics_data = analytics_data;
 
 writefile("luna_xyz/analytics/stats.json", HttpService:JSONEncode(analytics_data));
-Logger.success(('Loaded analytics data. - (%s)'):format(string.format("%.2f", os.clock() - startTime2)));
+Logger.success(('Loaded analytics data. - (%.2f)'):format(os.clock() - startTime2));
 
 ----- || ASSETS CHECK || -----
 
@@ -347,13 +347,13 @@ for _, image_url in ipairs(luna_assets) do
 	if not isfile(image_path) then
 		
 		writefile(image_path, game:HttpGet(image_url));
-		Logger.info(('Asset %s updated. - (%s)'):format(image_path, string.format("%.2f", os.clock() - startTime2)));
+		Logger.info(('Asset %s updated. - (%.2f)'):format(image_path, os.clock() - startTime2));
 	end;
 	
-	Logger.success(('The Asset %s loaded successfully. - (%s)'):format(image_path, string.format("%.2f", os.clock() - startTime2)));
+	Logger.success(('The Asset %s loaded successfully. - (%.2f)'):format(image_path, os.clock() - startTime2));
 end;
 
-Logger.success(('Loaded luna.xyz assets. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
+Logger.success(('Loaded luna.xyz assets. - (%.2f)'):format(os.clock() - startTime));
 
 ----- || MODULES CHECK || -----
 
@@ -373,7 +373,7 @@ for _, module in ipairs(modules_list) do
 	end;
 end;
 
-Logger.success(('Loaded luna.xyz modules. - (%s)'):format(string.format("%.2f", os.clock() - startTime)));
+Logger.success(('Loaded luna.xyz modules. - (%.2f)'):format(os.clock() - startTime));
 FileManager.FilesLoaded = true;
 
 return FileManager;
