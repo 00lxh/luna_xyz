@@ -7,21 +7,21 @@ function AdonisBypasser:Detect()
 		return false;
 	end;
 
-	local AdonisDetected = false;
+	local adonisDetected = false;
 
 	for _, thread in getreg() do
 
 		if typeof(thread) ~= "thread" then continue; end;
-		local Source = debug.info(thread, 1, "s");
+		local source = debug.info(thread, 1, "s");
 
-		if Source and (Source:match(".Core.Anti") or Source:match(".Plugins.Anti_Cheat")) then
+		if source and (source:match(".Core.Anti") or source:match(".Plugins.Anti_Cheat")) then
 
-			AdonisDetected = true;
+			adonisDetected = true;
 			table.insert(AdonisAnticheatThreads, thread);
 		end;
 	end;
 
-	return AdonisDetected;
+	return adonisDetected;
 end;
 
 function AdonisBypasser:Bypass()
@@ -30,22 +30,24 @@ function AdonisBypasser:Bypass()
 		pcall(coroutine.close, thread);
 	end;
 
-	local AdonisTables = {};
-	local ContendorAdonisTables = filtergc("table", { Keys = { "Detected", "RLocked" } });
+	local adonisTables = {};
+	local contendorAdonisTables = filtergc("table", { Keys = { "Detected"; "RLocked"; } });
 
-	for _, AdonisTable in ContendorAdonisTables do
+	for _, adonisTable in contendorAdonisTables do
 
-		if typeof(rawget(AdonisTable, "Detected")) ~= "function" then continue; end;
-		table.insert(AdonisTables, AdonisTable);
+		if typeof(rawget(adonisTable, "Detected")) ~= "function" then continue; end;
+		table.insert(adonisTables, adonisTable);
 	end;
 
-	for _, Adonis in AdonisTables do
-		for _, DetectionFunc in Adonis do
+	for _, adonis in adonisTables do
+		for _, detectionFunc in adonis do
 
-			if typeof(DetectionFunc) ~= "function" or isfunctionhooked(DetectionFunc) then continue; end;
+			if typeof(detectionFunc) ~= "function" or isfunctionhooked(detectionFunc) then continue; end;
 
-			HookService:Hook(DetectionFunc, function(action, info, nocrash)
-				coroutine.yield(); return task.wait(9e9)
+			HookService:Hook(detectionFunc, function(action, info, nocrash)
+				
+				coroutine.yield();
+				return task.wait(9e9);
 			end);
 		end;
 	end;
