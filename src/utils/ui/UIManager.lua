@@ -627,15 +627,15 @@ function UICreator:CreateCreditsTab()
 
 	----- || TESTERS || -----
 
-	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of revenant sunrisen, Violence District', true);
-	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of rakoof, project lazarus', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">rubie</font>] - Tester of Revenant Sunrisen, Violence District', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of Rakoof, Project Lazarus', true);
 	
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">Mr.Storm</font>] - Tester of Violence District', true);
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">88404</font>] - Tester of Violence District', true);
 
 	----- || CONTRIBUTORS || -----
 
-	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with rakoof, rake remastered, project lazarus, Violence District', true);
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with Rakoof, Rake Remastered, Project Lazarus, Violence District', true);
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">Ryo Yamada</font>] - Helped with revenant sunrisen', true);
 
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">deividcomsono</font>] - Obsidian UI library developer', true);
