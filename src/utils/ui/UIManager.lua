@@ -247,7 +247,7 @@ function UICreator:CreateMainWindow(system_data)
 			end;
 			
 			local current_ping = pingStats and floor(pingStats:GetValue()) or "N/A";
-			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, current_ping, luna_xyz_env.versions[luna_xyz_env.ScriptLoader]));
+			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, current_ping, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
 		end));
 	end);
 
