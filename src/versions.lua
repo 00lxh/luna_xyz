@@ -6,7 +6,7 @@ local versions = {
 	["rake_remastered"] = "v2.4.3";
 	
 	["project_lazarus"] = "v1.0.2";
-	["violence_district"] = "v1.3.3";
+	["violence_district"] = "v1.3.4";
 };
 
 return versions;
