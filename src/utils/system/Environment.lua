@@ -12,6 +12,65 @@ luna_cache.Name = "luna_cache";
 local UserInputService = cloneref(game:GetService("UserInputService"));
 local GuiService = cloneref(game:GetService("GuiService"));
 
+local Players = cloneref(game:GetService("Players"));
+local LP = Players.LocalPlayer;
+
+function luna_xyz_env:GetClosestPlayer(filters)
+
+	local rootPart = luna_xyz_env:GetRoot(LP);
+	if not rootPart then return nil; end;
+
+	local closest, shortestDist = nil, math.huge;
+
+	for _, v in ipairs(Players:GetChildren()) do
+
+		if not v.Character or v == LP then continue; end;
+
+		local targetRoot = luna_xyz_env:GetRoot(v);
+		if not targetRoot or not luna_xyz_env:MatchesFilters(v, filters) then continue; end;
+
+		local dist = (rootPart.Position - targetRoot.Position);
+		if dist:Dot(dist) > (shortestDist ^ 2) then continue; end;
+
+		closest, shortestDist = v.Character, dist.Magnitude;
+	end;
+
+	return closest;
+end;
+
+function luna_xyz_env:MatchesFilters(player, filters)
+
+	filters = filters or {};
+	
+	if filters.Team and player.Team and player.Team.Name ~= filters.Team then
+		return false;
+	end;
+	
+	local character = player.Character;
+
+	for attribute, expected in pairs(filters.Attributes or {}) do
+
+		local value = character:GetAttribute(attribute);
+
+		if type(expected) == "function" then
+
+			if not expected(value) then
+				return false;
+			end;
+
+		elseif expected == false then
+
+			value = value == true;
+			if value then return false; end;
+
+		elseif value ~= expected then
+			return false;
+		end;
+	end;
+
+	return true;
+end;
+
 function luna_xyz_env:ParseBoolean(raw: any, default: boolean)
 	
 	if raw == nil then return default or false; end;
