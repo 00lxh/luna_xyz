@@ -136,7 +136,7 @@ function UICreator:CreateMainWindow(system_data)
 		Image = Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420);
 	});
 
-	AccountGroup:AddLabel(('%s, %s\n» <b>%s</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName, GetStatus(system_data)), true);
+	AccountGroup:AddLabel(('%s, %s\n» <b>%s</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName, GetStatus()), true , "MyInfo");
 	AccountGroup:AddDivider();
 
 	AccountGroup:AddButton("Join Discord", function()
@@ -397,6 +397,29 @@ function UICreator:CreateSettingsTab()
 			luna_xyz_env.waterMark:SetVisible(value);
 		end;
 	});
+	
+	MenuGroup:AddToggle("IncognitoMode", {
+
+		Text = "Incognito Mode";
+		Default = false;
+
+		Callback = function(value)
+
+			if value then
+				
+				luna_xyz_env.Options.MyImage:SetImage(getcustomasset and getcustomasset("luna_xyz/assets/luna_v3.png") or Players:GetUserThumbnailAsync(1, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420));
+				luna_xyz_env.Options.MyImage:SetScaleType(Enum.ScaleType.Crop);
+				
+				luna_xyz_env.Labels.MyInfo:SetText(('%s, %s\n» <b>%s</b>'):format(GetGreeting(), "luna.xyz", '<font color="rgb(255, 200, 76)">🌙 luna.xyz</font>'));
+				return;
+			end;
+			
+			luna_xyz_env.Options.MyImage:SetImage(Players:GetUserThumbnailAsync(Players.LocalPlayer.UserId, Enum.ThumbnailType.AvatarBust, Enum.ThumbnailSize.Size420x420));
+			luna_xyz_env.Options.MyImage:SetScaleType(Enum.ScaleType.Fit);
+			
+			luna_xyz_env.Labels.MyInfo:SetText(('%s, %s\n» <b>%s</b>'):format(GetGreeting(), Players.LocalPlayer.DisplayName, GetStatus()));
+		end;
+	});
 
 	MenuGroup:AddToggle("KeybindMenuOpen", {
 
@@ -631,7 +654,7 @@ function UICreator:CreateCreditsTab()
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Tester of Rakoof, Project Lazarus', true);
 	
 	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">Mr.Storm</font>] - Tester of Violence District', true);
-	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">88404</font>] - Tester of Violence District', true);
+	TestersSection:AddLabel('[<font color="rgb(0, 255, 0)">88404</font>] - Tester of Rake Remastered, Violence District', true);
 
 	----- || CONTRIBUTORS || -----
 
