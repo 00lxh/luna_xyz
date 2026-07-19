@@ -9,12 +9,12 @@ local RunService = luna_xyz_env:GetService("RunService");
 local Players = luna_xyz_env:GetService("Players");
 local LP = Players.LocalPlayer;
 
+local Maid = luna_xyz_env and luna_xyz_env.Maid;
+
 function Fly:Setup()
-	
-	if luna_xyz_env.Maid.FlyConnection then luna_xyz_env.Maid.FlyConnection = nil; end;
-	if luna_xyz_env.Maid.FlyCharacterAdded then luna_xyz_env.Maid.FlyCharacterAdded = nil; end;
-	
-	if not luna_xyz_env then return; end;
+
+	if Maid and Maid.FlyConnection then Maid.FlyConnection = nil; end;
+	if Maid and Maid.FlyCharacterAdded then Maid.FlyCharacterAdded = nil; end;
 	
 	local flyBody = Instance.new("BodyVelocity");
 	flyBody.Velocity, flyBody.MaxForce = Vector3.zero, Vector3.one * 9e9;
@@ -45,31 +45,34 @@ end;
 
 function Fly:Toggle(value: boolean)
 	
-	if luna_xyz_env.Maid.FlyCharacterAdded then luna_xyz_env.Maid.FlyCharacterAdded = nil; end;
+	if Maid and Maid.FlyCharacterAdded then Maid.FlyCharacterAdded = nil; end;
 	if not Fly.Loaded then return warn('[FLY]: Use "Fly:Setup()" before using this function.'); end;
 	
-	local rootPart = luna_xyz_env:GetRoot(LP);
-	if not rootPart then return warn("[FLY]: HumanoidRootPart is missing or nil."); end;
+	local character = LP.Character or LP.CharacterAdded:Wait();
 	
-	local humanoid = rootPart and rootPart.Parent:FindFirstChildOfClass("Humanoid");
+	local rootPart = character and character:FindFirstChild("HumanoidRootPart");
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid");
+	
+	if not rootPart then return warn("[FLY]: HumanoidRootPart is missing or nil."); end;
 	if humanoid then humanoid.PlatformStand = value; end;
 	
 	Fly.Enabled = value;
 	
 	pcall(function()
+		
 		Fly.FlyBody.Parent = if value then rootPart else nil;
 		Fly.FlyGyro.Parent = if value then rootPart else nil;
-	end);
-	
-	luna_xyz_env.Maid.FlyCharacterAdded = LP.CharacterAdded:Connect(function(character)
 		
-		task.wait(.3);
-		if not Fly.Enabled or not luna_xyz_env then return; end;
-		
-		if Fly.FlyBody then Fly.FlyBody:Destroy(); end;
-		if Fly.FlyGyro then Fly.FlyGyro:Destroy(); end;
-		
-		Fly:Setup(); Fly:Toggle(true);
+		Maid.FlyCharacterAdded = LP.CharacterAdded:Connect(function(character)
+
+			task.wait(.3);
+			if not Fly.Enabled or not luna_xyz_env then return; end;
+
+			if Fly.FlyBody then Fly.FlyBody:Destroy(); end;
+			if Fly.FlyGyro then Fly.FlyGyro:Destroy(); end;
+
+			Fly:Setup(); Fly:Toggle(true);
+		end);
 	end);
 end;
 
