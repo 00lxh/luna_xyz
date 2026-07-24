@@ -659,7 +659,7 @@ function UICreator:CreateCreditsTab()
 	----- || CONTRIBUTORS || -----
 
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">TexRBLX</font>] - Helped with Rakoof, Rake Remastered, Project Lazarus, Violence District', true);
-	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">Ryo Yamada</font>] - Helped with revenant sunrisen', true);
+	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">rokkzu</font>] - Helped with revenant sunrisen', true);
 
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">deividcomsono</font>] - Obsidian UI library developer', true);
 	ContributorsSection:AddLabel('[<font color="rgb(0, 255, 0)">mspaint</font>] - Inspiration for the new version of luna.xyz', true);
