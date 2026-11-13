@@ -17,8 +17,6 @@ luna_xyz_env.Toggles = getgenv().Library.Toggles;
 luna_xyz_env.Options = getgenv().Library.Options;
 luna_xyz_env.Labels = getgenv().Library.Labels;
 
-local pingStats
-
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
 	"The same side of the Moon always faces Earth due to tidal locking.";
@@ -241,7 +239,7 @@ function UICreator:CreateMainWindow(system_data)
 				deltaTimesInterval, frame_count = 0, 0; lastUpdated = current_time;
 			end;
 			
-			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
+			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s'):format(luna_xyz_env.ScriptName, current_fps, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
 		end));
 	end);
 
