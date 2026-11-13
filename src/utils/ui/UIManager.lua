@@ -3,9 +3,6 @@ local UICreator = {};
 local HttpService = luna_xyz_env:GetService("HttpService");
 local Players = luna_xyz_env:GetService("Players");
 
-local StatsService = luna_xyz_env:GetService("Stats");
-local RunService = luna_xyz_env:GetService("RunService");
-
 local floor = math.floor;
 luna_xyz_env.Library = luna_xyz_env:GetService("Library");
 
@@ -21,27 +18,6 @@ luna_xyz_env.Options = getgenv().Library.Options;
 luna_xyz_env.Labels = getgenv().Library.Labels;
 
 local pingStats
-
-pcall(function()
-	pingStats = StatsService.Network.ServerStatsItem["Data Ping"]
-end)
-
-local function getPing()
-	if not pingStats then
-		return "N/A"
-	end
-
-	local success, value = pcall(function()
-		return pingStats:GetValue()
-	end)
-
-	if success and value then
-		return tostring(floor(value))
-	end
-
-	return "N/A"
-end
-
 
 local moonFunFacts = {
 	"The Moon is drifting away from Earth at about 3.8 centimeters per year.";
@@ -248,7 +224,7 @@ function UICreator:CreateMainWindow(system_data)
 	
 	----- || WATERMARK || -----
 	
-	local waterMark = luna_xyz_env.Library:AddDraggableLabel(('%s - luna.xyz | %s FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, "N/A", "N/A", tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
+	local waterMark = luna_xyz_env.Library:AddDraggableLabel(('%s - luna.xyz | %s FPS | %s'):format(luna_xyz_env.ScriptName, "N/A", tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
 	local deltaTimesInterval, frame_count, current_fps, lastUpdated, updateInterval = 0, 0, 0, os.clock(), 0.3;
 	
 	pcall(function()
@@ -265,7 +241,7 @@ function UICreator:CreateMainWindow(system_data)
 				deltaTimesInterval, frame_count = 0, 0; lastUpdated = current_time;
 			end;
 			
-			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, getPing(), tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
+			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
 		end));
 	end);
 
