@@ -6,9 +6,6 @@ local Players = luna_xyz_env:GetService("Players");
 local StatsService = luna_xyz_env:GetService("Stats");
 local RunService = luna_xyz_env:GetService("RunService");
 
-local serverStats = StatsService:FindFirstChild("Network") and StatsService.Network:FindFirstChild("ServerStatsItem");
-local pingStats = serverStats and serverStats:FindFirstChild("Data Ping");
-
 local floor = math.floor;
 luna_xyz_env.Library = luna_xyz_env:GetService("Library");
 
@@ -22,6 +19,28 @@ luna_xyz_env.Toggles = getgenv().Library.Toggles;
 
 luna_xyz_env.Options = getgenv().Library.Options;
 luna_xyz_env.Labels = getgenv().Library.Labels;
+
+local pingStats
+
+pcall(function()
+	pingStats = StatsService.Network.ServerStatsItem["Data Ping"]
+end)
+
+local function getPing()
+	if not pingStats then
+		return "N/A"
+	end
+
+	local success, value = pcall(function()
+		return pingStats:GetValue()
+	end)
+
+	if success and value then
+		return tostring(floor(value))
+	end
+
+	return "N/A"
+end
 
 
 local moonFunFacts = {
@@ -246,8 +265,7 @@ function UICreator:CreateMainWindow(system_data)
 				deltaTimesInterval, frame_count = 0, 0; lastUpdated = current_time;
 			end;
 			
-			local current_ping = pingStats and floor(pingStats:GetValue()) or "N/A";
-			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, current_ping, tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
+			waterMark:SetText(('%s - luna.xyz | %.1f FPS | %s ms | %s'):format(luna_xyz_env.ScriptName, current_fps, getPing(), tostring(luna_xyz_env.versions[luna_xyz_env.ScriptLoader])));
 		end));
 	end);
 
