@@ -53,18 +53,18 @@ function luna_xyz_env:IsValidGame(obj)
 
 	assert(obj, "argument 1 missing or nil");
 	if tostring(obj) == "*" then return true, nil; end;
-	
+
 	for name, data in games_metadata do
-		
+
 		local place_id, game_id = tostring(game.PlaceId), tostring(game.GameId);
-		local data_game_id, data_lobby_id = tostring(data.GameId), tostring(game.LobbyGameId);
-		
+		local data_game_id, data_lobby_id = tostring(data.GameId), tostring(data.LobbyGameId);
+
 		if data.GameId and (place_id == data_game_id or game_id == data_game_id) then
 			return true, data;
 		end
 
 		if data.LobbyGameId and (place_id == data_lobby_id or game_id == data_lobby_id) then
-			
+
 			data.IsGameLobby = true;
 			return true, data;
 		end
