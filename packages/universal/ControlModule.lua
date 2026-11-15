@@ -1,6 +1,7 @@
 ----- || ENV INIT || ------
 
 local getgenv = (getgenv or function() return _G; end);
+local luna_xyz_env = getgenv().luna_xyz_env;
 
 ----- || SERVICES || -----
 
