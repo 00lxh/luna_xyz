@@ -1,31 +1,37 @@
+---- || LOADING CHECK || -----
+
 local getgenv = (getgenv or function() return _G; end);
+local luna_xyz_env = getgenv().luna_xyz_env;
+
+----- || SERVICES || -----
 
 local CacheFoler = luna_xyz_env:GetService("Cache");
 local games_metadata = luna_xyz_env.games_metadata;
+
+----- || LIBRARIES || -----
 
 local Notifications = {
 	NotifyVolume = 2; NotifySound = true; NotifyType = "luna.xyz"; NotifySoundId = 82845990304289; DefaultSoundId = 82845990304289; customNotifications = {};
 };
 
-local supported_formats = { notify = true; };
+local supported_formats = { notif = true; notify = true; lnotif = true; };
 if isfolder and makefolder then makefolder("luna_xyz"); makefolder("luna_xyz/custom"); end;
 
 local formats_text = {};
 for format in supported_formats do table.insert(formats_text, ('".%s"'):format(format)); end;
 
+----- || METHODS || -----
+
 function Notifications:GetCustomNotifications()
 
 	Notifications.customNotifications = {};
 
-	local notifications = (isfolder and isfolder("luna_xyz/custom")) and listfiles and listfiles("luna_xyz/custom") or {};
+	local notifications = (isfolder and isfolder("luna_xyz/custom")) and (listfiles and listfiles("luna_xyz/custom")) or {};
 	if not (luna_xyz_env.SupportsFileSystem or #notifications > 0) then return Notifications.customNotifications; end;
 
 	for _, path in notifications do
 
-		local notification_name = path:match(".+\\(.+)") or path;
-		Logger.debug(('Initializing %s.lua..'):format(notification_name));
-
-		if not supported_formats[(path:match("%.([%w]+)$") or ""):lower()] then
+		local notification_name = path:match(".+\\(.+)") or path; if not supported_formats[(path:match("%.([%w]+)$") or ""):lower()] then
 
 			Logger.error(('Failed to initialize custom notification %s.lua'):format(notification_name));
 			Logger.error(('    RUNTIME ERROR: Invalid extension type must be %s'):format(table.concat(formats_text, ", ")));
@@ -38,10 +44,11 @@ function Notifications:GetCustomNotifications()
 		end;
 
 		local success, data = compile_func(path)();
+		Logger.debug(('Initializing Custom Notification: %s..'):format(notification_name));
 
 		if not success then
 
-			Logger.error(('Failed to initialize custom notification %s.lua'):format(notification_name));
+			Logger.error(('Failed to initialize custom notification %s.'):format(notification_name));
 			Logger.error(('    RUNTIME ERROR: %s'):format(tostring(data)));
 
 			continue;
@@ -49,7 +56,7 @@ function Notifications:GetCustomNotifications()
 
 		if not data.Name then
 
-			Logger.error(('Failed to initialize custom notification %s.lua'):format(notification_name));
+			Logger.error(('Failed to initialize custom notification %s.'):format(notification_name));
 			Logger.error(('    RUNTIME ERROR: Invalid title argument (string expected, got %s)'):format(tostring(typeof(data.Name))));
 
 			continue;
@@ -57,14 +64,14 @@ function Notifications:GetCustomNotifications()
 
 		if not data.Notify then
 
-			Logger.error(('Failed to initialize custom notification %s.lua'):format(notification_name));
+			Logger.error(('Failed to initialize custom notification %s.'):format(notification_name));
 			Logger.error(('    RUNTIME ERROR: Invalid function argument (function expected, got %s)'):format(tostring(typeof(data.Notify))));
 
 			continue;
 		end;
 
 		Notifications.customNotifications[data.Name] = data;
-		Logger.debug(('Custom notification %s.lua initialized successfully.'):format(notification_name));
+		Logger.debug(('Custom notification "%s" initialized successfully.'):format(notification_name));
 	end;
 
 	return Notifications.customNotifications;
@@ -131,6 +138,8 @@ end;
 function Notifications:ToggleSound(value: boolean)
 	Notifications.NotifySound = luna_xyz_env:ParseBoolean(value);
 end;
+
+----- || FINALIZE || -----
 
 luna_xyz_env.Notify = Notifications.Notify;
 return Notifications;
