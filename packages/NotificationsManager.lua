@@ -7,11 +7,11 @@ local Notifications = {
 	NotifyVolume = 2; NotifySound = true; NotifyType = "luna.xyz"; NotifySoundId = 82845990304289; DefaultSoundId = 82845990304289; customNotifications = {};
 };
 
-local suppoerted_formats = { notify = true; };
+local supported_formats = { notify = true; };
 if isfolder and makefolder then makefolder("luna_xyz"); makefolder("luna_xyz/custom"); end;
 
 local formats_text = {};
-for format in suppoerted_formats do table.insert(formats_text, ('".%s"'):format(format)); end;
+for format in supported_formats do table.insert(formats_text, ('".%s"'):format(format)); end;
 
 function Notifications:GetCustomNotifications()
 
@@ -25,7 +25,7 @@ function Notifications:GetCustomNotifications()
 		local notification_name = path:match(".+\\(.+)") or path;
 		Logger.debug(('Initializing %s.lua..'):format(notification_name));
 
-		if not suppoerted_formats[(path:match("%.([%w]+)$") or ""):lower()] then
+		if not supported_formats[(path:match("%.([%w]+)$") or ""):lower()] then
 
 			Logger.error(('Failed to initialize custom notification %s.lua'):format(notification_name));
 			Logger.error(('    RUNTIME ERROR: Invalid extension type must be %s'):format(table.concat(formats_text, ", ")));
