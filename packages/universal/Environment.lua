@@ -56,21 +56,14 @@ function luna_xyz_env:IsValidGame(obj)
 
 	for name, data in games_metadata do
 
-		local place_id, game_id = tostring(game.PlaceId), tostring(game.GameId);
-		local data_game_id, data_lobby_id = tostring(data.GameId), tostring(data.LobbyGameId);
+		local data_game_id = tostring(data.GameId);
+		if data.GameId and (tostring(obj) == data_game_id) then return true, data, false; end
 
-		if data.GameId and (place_id == data_game_id or game_id == data_game_id) then
-			return true, data;
-		end
+		local data_lobby_id = tostring(data.LobbyGameId);
+		if data.LobbyGameId and (tostring(obj) == data_lobby_id) then return true, data, true; end;
+	end;
 
-		if data.LobbyGameId and (place_id == data_lobby_id or game_id == data_lobby_id) then
-
-			data.IsGameLobby = true;
-			return true, data;
-		end
-	end
-
-	return false, nil;
+	return false, nil, false;
 end;
 
 function luna_xyz_env:GetService(serviceName)
