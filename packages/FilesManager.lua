@@ -20,17 +20,20 @@ local default_settings = {
 
 	General = {
 
-		IncognitoMode = false; DiscordRichPresence = false;
-		ExecuteOnTeleport = false; ConsoleLogs = false; CreateLogs = true;
+		IncognitoMode = false; WatermarkVisibility = true;
+		KeybindMenuOpen = false; KeybindMenuSettings = true;
+		
+		DiscordRichPresence = false; ExecuteOnTeleport = false; 
+		ConsoleLogs = false; CreateLogs = true;
 	};
 
 	Menu = {
-
+		
+		ForceCheckbox = false; ShowCustomCursor = false;
 		WindowAlwaysOnTop = false; WindowHideOnLoad = false;
-		WatermarkVisibility = true; KeybindMenuOpen = false;
-
-		KeybindMenuSettings = true; ShowCustomCursor = false;
-		ForceCheckbox = false; MenuKeybind = "LeftAlt"; MenuDPI = "100%"; 
+		
+		PanicKeybind = "P"; MenuKeybind = "LeftAlt";
+		MenuDPI = "100%"; Position = "6,6";
 	};
 
 	Notifications  = {
@@ -51,12 +54,12 @@ local luna_files = {
 	["custom"] = {}; ["analytics"] = {}; ["saves"] = {};
 
 	["assets"] = {
-		
+
 		["luna_v1.png"] = { type = "file"; content = game:HttpGet("https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v1.png?raw=true"); };
 		["luna_v2.png"] = { type = "file"; content = game:HttpGet("https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v2.png?raw=true"); };
 		["luna_v3.png"] = { type = "file"; content = game:HttpGet("https://github.com/00lxh/luna_xyz/blob/main/src/assets/luna_v3.png?raw=true"); };
 	};
-	
+
 	["logs"] = {
 		["NOTICE.txt"] = { type = "file"; content = "WARNING:\nDo NOT share these logs with anyone other than the developers.\n\nThey may contain sensitive information such as but not limited to: Username, HWID, and Security Tokens.\nThese logs are crash reports and are only helpful to the developers. You may delete these if needed. Logs older than 10 days are automatically deleted.\n\n- Thank you <3!"; };
 	};
@@ -89,7 +92,7 @@ local function MergeTables(defaults, loaded)
 		if type(value) == "table" and type(defaults[key]) == "table" then merged[key] = MergeTables(defaults[key], value); continue; end;
 		merged[key] = type(value) == "table" and DeepCopy(value) or value;
 	end;
-	
+
 	return merged;
 end;
 
