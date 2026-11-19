@@ -52,9 +52,9 @@ end);
 
 function Fly:Toggle(value: boolean)
 
-	if not Loaded.Loaded then return warn('[FLY]: Module is not initialized. Please re-execute the module.'); end;
+	if not Fly.Loaded then return warn('[FLY]: Module is not initialized. Please re-execute the module.'); end;
 	if luna_xyz_env.Maid.FlyCharacterAdded then luna_xyz_env.Maid.FlyCharacterAdded = nil; end;
-	
+
 	local character = LP.Character or LP.CharacterAdded:Wait();
 
 	local rootPart = character and character:FindFirstChild("HumanoidRootPart");
@@ -69,7 +69,7 @@ function Fly:Toggle(value: boolean)
 	self.FlyGyro.Parent = if value then rootPart else nil;
 
 	luna_xyz_env.Maid.FlyCharacterAdded = LP.CharacterAdded:Connect(function()
-		
+
 		if not (self.Loaded or Fly.Enabled) then return; end;
 
 		if self.FlyBody then self.FlyBody:Destroy(); self.FlyBody = nil; end;
@@ -78,7 +78,7 @@ function Fly:Toggle(value: boolean)
 		task.wait(.3);
 		self:Setup(); self:Toggle(true);
 	end);
-	
+
 	return self;
 end;
 
