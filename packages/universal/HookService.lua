@@ -16,7 +16,7 @@ local HookService, Quartz = {}, getgenv().Quartz or luna_xyz_env.Quartz;
 if not Quartz then
 
 	Quartz = loadstring(game:HttpGet("https://gitlab.com/upio/quartz/-/releases/permalink/latest/downloads/Quartz.luau"))();
-	Quartz = test.new(); Quartz:TestAll(); getgenv().Quartz = Quartz;
+	Quartz = Quartz.new(); Quartz:TestAll(); getgenv().Quartz = Quartz;
 end;
 
 ----- || HOOKS || -----
