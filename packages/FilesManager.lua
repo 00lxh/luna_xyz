@@ -33,7 +33,7 @@ local default_settings = {
 		WindowAlwaysOnTop = false; WindowHideOnLoad = false;
 		
 		PanicKeybind = "P"; MenuKeybind = "LeftAlt";
-		MenuDPI = "100%"; Position = "6,6";
+		MenuDPI = "100%"; Position = "-360,300";
 	};
 
 	Notifications  = {
