@@ -29,7 +29,7 @@ local default_settings = {
 
 	Menu = {
 		
-		ForceCheckbox = false; ShowCustomCursor = false;
+		CompactedSidebar = true; ShowCustomCursor = false; ForceCheckbox = false; 
 		WindowAlwaysOnTop = false; WindowHideOnLoad = false;
 		
 		PanicKeybind = "P"; MenuKeybind = "LeftAlt";
